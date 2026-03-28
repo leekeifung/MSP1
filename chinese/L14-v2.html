@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第十四課｜開玩具店｜認讀與聽寫練習（含標點朗讀｜iPad 相容強化）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;background:linear-gradient(135deg,#fdf6e3 0%,#fef9ef 100%);color:#333;line-height:1.8;padding:16px;max-width:840px;margin:0 auto}
+h1{font-size:1.4em;color:#7c3aed;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:#9333ea;font-size:.92em;margin-bottom:6px}
+.note{text-align:center;color:#999;font-size:.78em;margin-bottom:22px}
+.panel{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:18px;margin-bottom:22px}
+.panel h2{font-size:1.12em;color:#7c3aed;border-bottom:2px solid #e9d5ff;padding-bottom:6px;margin-bottom:12px}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 13px;border-radius:8px;border:1.5px solid #d8b4fe;background:#f5f3ff;color:#6b21a8;font-size:.91em;cursor:pointer;transition:all .2s;font-family:inherit;user-select:none}
+.btn:hover{background:#ede9fe}.btn:active{transform:scale(.97)}
+.btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.btn.green{border-color:#86efac;background:#f0fdf4;color:#166534}.btn.green:hover{background:#dcfce7}
+.btn.blue{border-color:#93c5fd;background:#eff6ff;color:#1e40af}.btn.blue:hover{background:#dbeafe}
+.btn.orange{border-color:#fdba74;background:#fff7ed;color:#9a3412}.btn.orange:hover{background:#ffedd5}
+.lbl{color:#666;font-size:.88em;user-select:none}
+.status-msg{font-size:.83em;color:#888;margin-top:6px;min-height:1.5em}
+.lesson-text{background:#faf5ff;border-radius:10px;padding:16px;line-height:2.2;font-size:1.15em;margin-top:10px}
+.lesson-text .t-line{font-weight:bold;font-size:1.2em;color:#6b21a8}
+.fill-area{line-height:2.8;font-size:1.08em}
+.seg-punct{cursor:pointer;color:#9333ea;transition:color .15s;position:relative}
+.seg-punct:hover{color:#6b21a8}
+.seg-punct::after{content:'🔊';font-size:.55em;position:absolute;top:-10px;right:-6px;opacity:0;transition:opacity .15s}
+.seg-punct:hover::after{opacity:1}
+.speaker-btn{cursor:pointer;font-size:.95em;vertical-align:middle;user-select:none}
+.speaker-btn:active{transform:scale(1.15)}
+input.blank{width:3.5em;text-align:center;font-size:1em;border:none;border-bottom:2px solid #d8b4fe;background:transparent;color:#333;font-family:inherit;outline:none;transition:border-color .2s;margin:0 1px;padding:2px 0}
+input.blank:focus{border-bottom-color:#7c3aed;background:#faf5ff}
+input.blank.correct{border-bottom-color:#22c55e;color:#166534;background:#f0fdf4}
+input.blank.wrong{border-bottom-color:#ef4444;color:#dc2626;background:#fef2f2}
+.answer-reveal{font-size:.78em;color:#16a34a;display:none;margin-left:1px}
+input.blank.wrong~.answer-reveal{display:inline}
+.result-msg{font-size:.88em;color:#666;margin-top:10px;min-height:1.4em}
+.vocab-label{font-size:.88em;color:#9333ea;font-weight:bold;margin:12px 0 6px}
+.vocab-grid{display:flex;flex-wrap:wrap;gap:8px}
+.vocab-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;background:#f5f3ff;border:1.5px solid #d8b4fe;border-radius:22px;cursor:pointer;font-size:1.05em;transition:all .2s;user-select:none}
+.vocab-chip:hover{background:#ede9fe;transform:scale(1.05)}
+.vocab-chip .ico{font-size:.8em}
+.char-grid{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.char-cell{width:54px;height:54px;display:flex;align-items:center;justify-content:center;font-size:1.4em;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .2s;user-select:none;background:#fff}
+.char-cell:hover{border-color:#a78bfa;background:#faf5ff}
+.char-cell.selected{background:#ede9fe;border-color:#7c3aed;color:#7c3aed;font-weight:bold}
+.char-cell.ok-yes{background:#dcfce7;border-color:#22c55e;color:#166534}
+.char-cell.ok-no{background:#fff;border-color:#e2e8f0;color:#aaa}
+.char-cell.wrong{background:#fef2f2;border-color:#ef4444;color:#dc2626}
+.char-cell.missed{background:#fefce8;border-color:#eab308;color:#854d0e}
+.example-box{background:#faf5ff;border-left:3px solid #9333ea;padding:12px 16px;margin:10px 0;border-radius:0 8px 8px 0;font-size:.98em}
+.opp-row{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap}
+.opp-word{padding:6px 18px;background:#faf5ff;border:1.5px solid #d8b4fe;border-radius:8px;font-size:1.1em;min-width:50px;text-align:center}
+.opp-arrow{font-size:1.2em;color:#9333ea}
+.opp-input{width:4em;text-align:center;font-size:1.05em;padding:6px 4px;border:1.5px solid #d8b4fe;border-radius:8px;font-family:inherit;outline:none;background:#fff}
+.opp-input:focus{border-color:#7c3aed}
+.opp-input.correct{border-color:#22c55e;background:#f0fdf4;color:#166534}
+.opp-input.wrong{border-color:#ef4444;background:#fef2f2;color:#dc2626}
+.opp-ans{font-size:.82em;color:#16a34a;display:none;margin-left:4px}
+.badge{display:inline-block;background:#7c3aed;color:#fff;font-size:.7em;padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:6px}
+.badge.adv{background:#dc2626}
+@media(max-width:500px){body{padding:10px;font-size:15px}h1{font-size:1.2em}.panel{padding:13px}.char-cell{width:46px;height:46px;font-size:1.2em}.fill-area{font-size:1em;line-height:2.6}input.blank{width:2.8em}.opp-input{width:3.5em}}
+</style>
+</head>
+<body>
+
+<h1>第十四課｜開玩具店｜認讀與聽寫練習</h1>
+<p class="subtitle">（含標點朗讀｜iPad 相容強化）</p>
+<p class="note">已改良語音相容性：加入 iOS 互動啟用、voiceschanged 監聽與暖機流程。</p>
+
+<!-- ===== 語音控制 ===== -->
+<div class="panel" id="voicePanel">
+  <h2>🎙️ 語音控制</h2>
+  <div class="btn-row">
+    <span class="lbl">語速：</span>
+    <button class="btn rate-btn" data-r="0.5">0.5×</button>
+    <button class="btn rate-btn" data-r="0.6">0.6×</button>
+    <button class="btn rate-btn" data-r="0.7">0.7×</button>
+    <button class="btn rate-btn active" data-r="0.9">0.9×</button>
+    <button class="btn rate-btn" data-r="1">1.0×</button>
+    <button class="btn rate-btn" data-r="1.05">1.05×</button>
+  </div>
+  <div class="btn-row">
+    <span class="lbl">語音：</span>
+    <button class="btn green" onclick="activateVoice()">🔈 啟用語音</button>
+    <button class="btn blue" onclick="readAll()">▶️ 整篇朗讀</button>
+    <button class="btn" onclick="pauseRead()">⏸ 暫停</button>
+    <button class="btn" onclick="resumeRead()">▶️ 繼續</button>
+    <button class="btn orange" onclick="stopRead()">⏹ 停止</button>
+  </div>
+  <div class="status-msg" id="vStatus">語音未就緒，請先點「啟用語音」</div>
+</div>
+
+<!-- ===== 課文 ===== -->
+<div class="panel">
+  <h2>📖 課文（參考版，可全篇播放）</h2>
+  <button class="btn" onclick="toggleText()">🙈 顯示 / 隱藏</button>
+  <div class="lesson-text" id="lessonBox" style="display:none">
+    <div class="t-line">第十四課</div>
+    <div class="t-line" style="margin-bottom:10px">開玩具店</div>
+    <p>星期天，我和媽媽在家裏玩遊戲。</p>
+    <p>我對媽媽說：「這兒有一隻會唱歌的小鴨子、一輛會飛行的小汽車、一隻會吃錢的小豬，還有一個翅膀長長的小天使。太太，請來看看吧！」</p>
+    <p>媽媽說：「真熱鬧！哦，你開玩具店嗎？」</p>
+    <p>我說：「是啊！我是店主，我的玩具又多又新！您想買甚麼？」媽媽笑着說：「我兒子有很多有趣的玩具，不用再買了。」</p>
+  </div>
+</div>
+
+<!-- ===== 聽詞填空（基礎版）===== -->
+<div class="panel">
+  <h2>✍️ 聽詞填空（含標點朗讀）<span class="badge">基礎版</span></h2>
+  <p style="font-size:.83em;color:#888;margin-bottom:10px">點擊 🔊 可聽字詞或標點，將聽到的「字詞」填入空格；標點有獨立朗讀但無需填空。</p>
+  <div class="fill-area" id="fillBasic"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn green" onclick="gradeF('B')">✅ 批改</button>
+    <button class="btn blue" onclick="showF('B')">👀 顯示答案</button>
+    <button class="btn orange" onclick="resetF('B')">♻️ 重設</button>
+  </div>
+  <div class="result-msg" id="msgB">尚未批改。</div>
+</div>
+
+<!-- ===== 聽詞填空（進階版）===== -->
+<div class="panel">
+  <h2>✍️ 聽詞填空 — 全文聽寫 <span class="badge adv">進階版</span></h2>
+  <p style="font-size:.83em;color:#888;margin-bottom:10px">⚡ 全部文字皆需填寫！點擊 🔊 聽取每個字詞或標點，將聽到的內容填入空格。</p>
+  <div class="fill-area" id="fillAdv"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn green" onclick="gradeF('A')">✅ 批改</button>
+    <button class="btn blue" onclick="showF('A')">👀 顯示答案</button>
+    <button class="btn orange" onclick="resetF('A')">♻️ 重設</button>
+  </div>
+  <div class="result-msg" id="msgA">尚未批改。</div>
+</div>
+
+<!-- ===== 重點字詞 ===== -->
+<div class="panel">
+  <h2>📚 重點字詞｜點擊可聽讀音</h2>
+  <div class="vocab-label">認讀</div>
+  <div class="vocab-grid" id="vRead"></div>
+  <div class="vocab-label" style="margin-top:16px">應用</div>
+  <div class="vocab-grid" id="vUse"></div>
+</div>
+
+<!-- ===== 部首認讀小測驗 ===== -->
+<div class="panel">
+  <h2>🔍 「口」部首認讀小測驗</h2>
+  <p style="font-size:.88em;color:#666;margin-bottom:10px">請選出含有「口」部件的字，再按「批改」。</p>
+  <div class="char-grid" id="radGrid"></div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn green" onclick="gradeRad()">✅ 批改</button>
+    <button class="btn blue" onclick="showRad()">👀 顯示答案</button>
+    <button class="btn orange" onclick="resetRad()">♻️ 重選</button>
+  </div>
+  <div class="result-msg" id="radMsg">尚未作答。</div>
+</div>
+
+<!-- ===== 相反詞 ===== -->
+<div class="panel">
+  <h2>🔄 相反詞｜意思相反的詞語</h2>
+  <div class="example-box">
+    <strong>例：</strong>你不要<u>慢</u>下來，開得<u>快</u>一點。<br>
+    ➡️「慢」和「快」的意思是<strong>相反</strong>的。<br>
+    我們學過不少意思相反的詞語，例如「多」與「少」、「大」與「小」等。
+  </div>
+  <p style="font-size:.83em;color:#888;margin:12px 0 4px">🔀 每次載入會隨機排列，方向也會隨機調換！在空格中填上意思相反的詞語：</p>
+  <div id="oppArea"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn green" onclick="gradeOpp()">✅ 批改</button>
+    <button class="btn blue" onclick="showOpp()">👀 顯示答案</button>
+    <button class="btn orange" onclick="resetOpp()">♻️ 重設</button>
+  </div>
+  <div class="result-msg" id="oppMsg">尚未批改。</div>
+</div>
+
+<script>
+/* ========== TTS Engine (iOS-compatible) ========== */
+const S=window.speechSynthesis;
+let vReady=false,voice=null,rate=0.9,reading=false,rIdx=0;
+
+/* Rate buttons */
+document.querySelectorAll('.rate-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    rate=parseFloat(b.dataset.r);
+    document.querySelectorAll('.rate-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+
+function pickVoice(){
+  const vs=S.getVoices();
+  for(let p of['zh-TW','zh-HK','zh-CN','zh']){const v=vs.find(x=>x.lang.startsWith(p));if(v)return v}
+  return vs.find(x=>x.lang.includes('zh'))||vs[0]||null;
+}
+function loadV(){voice=pickVoice();if(voice){vReady=true;document.getElementById('vStatus').textContent='✅ 語音就緒：'+voice.name}}
+if(S){S.onvoiceschanged=loadV;loadV()}
+
+function activateVoice(){
+  if(!S){document.getElementById('vStatus').textContent='❌ 此瀏覽器不支援語音合成。';return}
+  const w=new SpeechSynthesisUtterance('');w.volume=0;S.speak(w);
+  setTimeout(()=>{loadV();if(!vReady)setTimeout(loadV,500);if(vReady)speak('語音已啟用');
+  else document.getElementById('vStatus').textContent='⏳ 語音載入中，請稍候再試…'},300);
+}
+
+function speak(txt,cb){
+  if(!S||!vReady)return;S.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(txt);
+    u.voice=voice;u.rate=rate;u.lang=voice?voice.lang:'zh-TW';
+    if(cb)u.onend=cb;S.speak(u);
+  },50);
+}
+
+/* Full read-aloud */
+const fullLines=[
+  '第十四課。','開玩具店。',
+  '星期天，我和媽媽在家裏玩遊戲。',
+  '我對媽媽說：「這兒有一隻會唱歌的小鴨子、一輛會飛行的小汽車、一隻會吃錢的小豬，還有一個翅膀長長的小天使。太太，請來看看吧！」',
+  '媽媽說：「真熱鬧！哦，你開玩具店嗎？」',
+  '我說：「是啊！我是店主，我的玩具又多又新！您想買甚麼？」',
+  '媽媽笑着說：「我兒子有很多有趣的玩具，不用再買了。」'
+];
+function readAll(){
+  if(!vReady){document.getElementById('vStatus').textContent='語音未就緒，請先點「啟用語音」';return}
+  S.cancel();reading=true;rIdx=0;rdNext();
+}
+function rdNext(){
+  if(!reading||rIdx>=fullLines.length){reading=false;return}
+  const u=new SpeechSynthesisUtterance(fullLines[rIdx]);
+  u.voice=voice;u.rate=rate;u.lang=voice?voice.lang:'zh-TW';
+  u.onend=()=>{rIdx++;setTimeout(rdNext,150)};S.speak(u);
+}
+function pauseRead(){if(S)S.pause()}
+function resumeRead(){if(S)S.resume()}
+function stopRead(){reading=false;if(S)S.cancel()}
+
+/* Toggle lesson text */
+let tVis=false;
+function toggleText(){tVis=!tVis;document.getElementById('lessonBox').style.display=tVis?'block':'none'}
+
+/* ========== Generic Fill Builder ========== */
+function buildFill(segs,elId){
+  const el=document.getElementById(elId);el.innerHTML='';const blanks=[];
+  segs.forEach(s=>{
+    if(s.t==='n'){el.appendChild(document.createElement('br'));return}
+    if(s.t==='x'){const sp=document.createElement('span');sp.textContent=s.v;el.appendChild(sp);return}
+    if(s.t==='p'){
+      const sp=document.createElement('span');sp.className='seg-punct';sp.textContent=s.v;
+      sp.title='點擊聽：'+s.r;sp.onclick=()=>speak(s.r);el.appendChild(sp);return;
+    }
+    if(s.t==='b'){
+      const btn=document.createElement('span');btn.className='speaker-btn';btn.textContent='🔊';
+      btn.title='點擊聽字詞';btn.onclick=()=>speak(s.a);el.appendChild(btn);
+      const inp=document.createElement('input');inp.type='text';inp.className='blank';
+      inp.dataset.answer=s.a;inp.style.width=(s.a.length*1.6+1.2)+'em';
+      inp.autocomplete='off';inp.spellcheck=false;el.appendChild(inp);
+      const rv=document.createElement('span');rv.className='answer-reveal';rv.textContent='('+s.a+')';el.appendChild(rv);
+      blanks.push(inp);
+    }
+  });
+  return blanks;
+}
+
+let blanksB=[],blanksA=[];
+function gradeF(k){
+  const arr=k==='B'?blanksB:blanksA,mid=k==='B'?'msgB':'msgA';
+  let c=0;arr.forEach(inp=>{
+    const v=inp.value.trim(),a=inp.dataset.answer;
+    inp.classList.remove('correct','wrong');
+    if(v===a){inp.classList.add('correct');c++}else inp.classList.add('wrong');
+  });
+  document.getElementById(mid).textContent='批改結果：'+c+' / '+arr.length+' 正確'+(c===arr.length?' 🎉 全對！太棒了！':'');
+}
+function showF(k){
+  const arr=k==='B'?blanksB:blanksA,mid=k==='B'?'msgB':'msgA';
+  arr.forEach(inp=>{inp.value=inp.dataset.answer;inp.classList.remove('wrong');inp.classList.add('correct')});
+  document.getElementById(mid).textContent='已顯示所有答案。';
+}
+function resetF(k){
+  const arr=k==='B'?blanksB:blanksA,mid=k==='B'?'msgB':'msgA';
+  arr.forEach(inp=>{inp.value='';inp.classList.remove('correct','wrong')});
+  document.getElementById(mid).textContent='尚未批改。';
+}
+
+/* ========== Basic Fill Segments ========== */
+const basicSegs=[
+  {t:'b',a:'星期天'},{t:'p',v:'，',r:'逗號'},
+  {t:'x',v:'我和媽媽在家裏玩'},{t:'b',a:'遊戲'},{t:'p',v:'。',r:'句號'},{t:'n'},
+
+  {t:'x',v:'我對媽媽說'},{t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'x',v:'這兒有一'},{t:'b',a:'隻'},{t:'x',v:'會唱歌的小'},{t:'b',a:'鴨子'},
+  {t:'p',v:'、',r:'頓號'},
+  {t:'x',v:'一'},{t:'b',a:'輛'},{t:'x',v:'會'},{t:'b',a:'飛行'},{t:'x',v:'的小'},{t:'b',a:'汽車'},
+  {t:'p',v:'、',r:'頓號'},
+  {t:'x',v:'一隻會吃'},{t:'b',a:'錢'},{t:'x',v:'的小豬'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'還有'},{t:'x',v:'一個'},{t:'b',a:'翅膀'},{t:'x',v:'長長的小'},{t:'b',a:'天使'},
+  {t:'p',v:'。',r:'句號'},
+  {t:'x',v:'太太'},{t:'p',v:'，',r:'逗號'},
+  {t:'x',v:'請來看看吧'},{t:'p',v:'！',r:'感嘆號'},{t:'p',v:'」',r:'下引號'},{t:'n'},
+
+  {t:'x',v:'媽媽說'},{t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'x',v:'真'},{t:'b',a:'熱鬧'},{t:'p',v:'！',r:'感嘆號'},
+  {t:'x',v:'哦'},{t:'p',v:'，',r:'逗號'},
+  {t:'x',v:'你開'},{t:'b',a:'玩具'},{t:'x',v:'店嗎'},
+  {t:'p',v:'？',r:'問號'},{t:'p',v:'」',r:'下引號'},{t:'n'},
+
+  {t:'x',v:'我說'},{t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'x',v:'是啊'},{t:'p',v:'！',r:'感嘆號'},
+  {t:'x',v:'我是'},{t:'b',a:'店主'},{t:'p',v:'，',r:'逗號'},
+  {t:'x',v:'我的'},{t:'b',a:'玩具'},{t:'x',v:'又多又'},{t:'b',a:'新'},
+  {t:'p',v:'！',r:'感嘆號'},
+  {t:'x',v:'您想'},{t:'b',a:'買'},{t:'x',v:'甚麼'},
+  {t:'p',v:'？',r:'問號'},{t:'p',v:'」',r:'下引號'},
+  {t:'x',v:'媽媽笑着說'},{t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'x',v:'我兒子有很多'},{t:'b',a:'有趣'},{t:'x',v:'的玩具'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'x',v:'不用再'},{t:'b',a:'買'},{t:'x',v:'了'},
+  {t:'p',v:'。',r:'句號'},{t:'p',v:'」',r:'下引號'},
+];
+
+/* ========== Advanced Fill Segments ========== */
+const advSegs=[
+  /* P1 */
+  {t:'b',a:'星期天'},{t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'我'},{t:'b',a:'和'},{t:'b',a:'媽媽'},
+  {t:'b',a:'在'},{t:'b',a:'家裏'},{t:'b',a:'玩'},{t:'b',a:'遊戲'},
+  {t:'p',v:'。',r:'句號'},{t:'n'},
+
+  /* P2 */
+  {t:'b',a:'我'},{t:'b',a:'對'},{t:'b',a:'媽媽'},{t:'b',a:'說'},
+  {t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'b',a:'這兒'},{t:'b',a:'有'},
+  {t:'b',a:'一隻'},{t:'b',a:'會'},{t:'b',a:'唱歌'},{t:'b',a:'的'},
+  {t:'b',a:'小'},{t:'b',a:'鴨子'},
+  {t:'p',v:'、',r:'頓號'},
+  {t:'b',a:'一輛'},{t:'b',a:'會'},{t:'b',a:'飛行'},{t:'b',a:'的'},
+  {t:'b',a:'小'},{t:'b',a:'汽車'},
+  {t:'p',v:'、',r:'頓號'},
+  {t:'b',a:'一隻'},{t:'b',a:'會'},{t:'b',a:'吃'},{t:'b',a:'錢'},
+  {t:'b',a:'的'},{t:'b',a:'小豬'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'還有'},{t:'b',a:'一個'},
+  {t:'b',a:'翅膀'},{t:'b',a:'長長'},{t:'b',a:'的'},
+  {t:'b',a:'小'},{t:'b',a:'天使'},
+  {t:'p',v:'。',r:'句號'},
+  {t:'b',a:'太太'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'請'},{t:'b',a:'來'},{t:'b',a:'看看'},{t:'b',a:'吧'},
+  {t:'p',v:'！',r:'感嘆號'},{t:'p',v:'」',r:'下引號'},{t:'n'},
+
+  /* P3 */
+  {t:'b',a:'媽媽'},{t:'b',a:'說'},
+  {t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'b',a:'真'},{t:'b',a:'熱鬧'},
+  {t:'p',v:'！',r:'感嘆號'},
+  {t:'b',a:'哦'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'你'},{t:'b',a:'開'},{t:'b',a:'玩具'},{t:'b',a:'店'},{t:'b',a:'嗎'},
+  {t:'p',v:'？',r:'問號'},{t:'p',v:'」',r:'下引號'},{t:'n'},
+
+  /* P4 */
+  {t:'b',a:'我'},{t:'b',a:'說'},
+  {t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'b',a:'是'},{t:'b',a:'啊'},
+  {t:'p',v:'！',r:'感嘆號'},
+  {t:'b',a:'我'},{t:'b',a:'是'},{t:'b',a:'店主'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'我'},{t:'b',a:'的'},{t:'b',a:'玩具'},
+  {t:'b',a:'又'},{t:'b',a:'多'},{t:'b',a:'又'},{t:'b',a:'新'},
+  {t:'p',v:'！',r:'感嘆號'},
+  {t:'b',a:'您'},{t:'b',a:'想'},{t:'b',a:'買'},{t:'b',a:'甚麼'},
+  {t:'p',v:'？',r:'問號'},{t:'p',v:'」',r:'下引號'},
+  {t:'b',a:'媽媽'},{t:'b',a:'笑着'},{t:'b',a:'說'},
+  {t:'p',v:'：',r:'冒號'},{t:'p',v:'「',r:'上引號'},
+  {t:'b',a:'我'},{t:'b',a:'兒子'},{t:'b',a:'有'},
+  {t:'b',a:'很多'},{t:'b',a:'有趣'},{t:'b',a:'的'},{t:'b',a:'玩具'},
+  {t:'p',v:'，',r:'逗號'},
+  {t:'b',a:'不用'},{t:'b',a:'再'},{t:'b',a:'買'},{t:'b',a:'了'},
+  {t:'p',v:'。',r:'句號'},{t:'p',v:'」',r:'下引號'},
+];
+
+/* ========== Vocab ========== */
+const wRead=['玩具','星期天','遊戲','鴨子','錢','還有','翅膀','天使','店主'];
+const wUse=['隻','輛','飛行','汽車','熱鬧','新','買','有趣'];
+function buildVocab(){
+  [['vRead',wRead],['vUse',wUse]].forEach(([id,arr])=>{
+    const el=document.getElementById(id);
+    arr.forEach(w=>{
+      const ch=document.createElement('span');ch.className='vocab-chip';
+      ch.innerHTML='<span class="ico">🔊</span> '+w;ch.onclick=()=>speak(w);el.appendChild(ch);
+    });
+  });
+}
+
+/* ========== 「口」部首測驗 ========== */
+const radData=[
+  {ch:'唱',y:true},{ch:'玩',y:false},{ch:'吃',y:true},{ch:'遊',y:false},
+  {ch:'嗎',y:true},{ch:'鴨',y:false},{ch:'哦',y:true},{ch:'錢',y:false},
+  {ch:'吧',y:true},{ch:'天',y:false},{ch:'啊',y:true},{ch:'新',y:false},
+];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function buildRad(){
+  const el=document.getElementById('radGrid');el.innerHTML='';
+  shuffle([...radData]).forEach(d=>{
+    const c=document.createElement('div');c.className='char-cell';c.textContent=d.ch;
+    c.dataset.y=d.y;c.onclick=()=>c.classList.toggle('selected');el.appendChild(c);
+  });
+}
+function gradeRad(){
+  const cells=document.querySelectorAll('#radGrid .char-cell');let c=0,tot=0;
+  cells.forEach(cl=>{
+    const y=cl.dataset.y==='true',s=cl.classList.contains('selected');
+    cl.classList.remove('selected','ok-yes','ok-no','wrong','missed');
+    if(y)tot++;
+    if(y&&s){cl.classList.add('ok-yes');c++}
+    else if(!y&&!s)cl.classList.add('ok-no');
+    else if(!y&&s)cl.classList.add('wrong');
+    else if(y&&!s)cl.classList.add('missed');
+  });
+  document.getElementById('radMsg').textContent='正確選出 '+c+' / '+tot+' 個含「口」的字'+(c===tot?' 🎉 全對！':'');
+}
+function showRad(){
+  document.querySelectorAll('#radGrid .char-cell').forEach(cl=>{
+    cl.classList.remove('selected','ok-yes','ok-no','wrong','missed');
+    cl.classList.add(cl.dataset.y==='true'?'ok-yes':'ok-no');
+  });
+  document.getElementById('radMsg').textContent='已顯示答案。綠色 = 含「口」部件。';
+}
+function resetRad(){
+  document.querySelectorAll('#radGrid .char-cell').forEach(cl=>{
+    cl.classList.remove('selected','ok-yes','ok-no','wrong','missed');
+  });
+  document.getElementById('radMsg').textContent='尚未作答。';
+}
+
+/* ========== 相反詞（32 組，隨機排列 + 隨機方向）========== */
+const oppAll=[
+  ['多','少'],['大','小'],['快','慢'],['長','短'],['新','舊'],['堅硬','柔軟'],
+  ['高','矮'],['胖','瘦'],['黑','白'],['前','後'],['上','下'],['左','右'],
+  ['遠','近'],['深','淺'],['厚','薄'],['寬','窄'],['熱','冷'],['開','關'],
+  ['來','去'],['好','壞'],['早','晚'],['輕','重'],['甜','苦'],['美','醜'],
+  ['笑','哭'],['乾','濕'],['亮','暗'],['安全','危險'],['容易','困難'],['開心','傷心'],
+  ['進','出'],['老','幼'],
+];
+let oppInps=[];
+function buildOpp(){
+  const el=document.getElementById('oppArea');el.innerHTML='';oppInps=[];
+  const list=shuffle([...oppAll]);
+  list.forEach(pair=>{
+    const flip=Math.random()>0.5;
+    const given=flip?pair[1]:pair[0];
+    const answer=flip?pair[0]:pair[1];
+    const row=document.createElement('div');row.className='opp-row';
+    /* speaker */
+    const sk=document.createElement('span');sk.className='speaker-btn';sk.textContent='🔊';
+    sk.style.cursor='pointer';sk.onclick=()=>speak(given);row.appendChild(sk);
+    /* given word */
+    const wd=document.createElement('span');wd.className='opp-word';wd.textContent=given;row.appendChild(wd);
+    /* arrow */
+    const ar=document.createElement('span');ar.className='opp-arrow';ar.textContent='⟷';row.appendChild(ar);
+    /* input */
+    const inp=document.createElement('input');inp.type='text';inp.className='opp-input';
+    inp.dataset.a=answer;inp.autocomplete='off';inp.spellcheck=false;
+    inp.style.width=(answer.length*1.8+1.5)+'em';
+    row.appendChild(inp);
+    /* reveal */
+    const rv=document.createElement('span');rv.className='opp-ans';rv.textContent='('+answer+')';row.appendChild(rv);
+    el.appendChild(row);oppInps.push(inp);
+  });
+}
+function gradeOpp(){
+  let c=0;oppInps.forEach(inp=>{
+    const v=inp.value.trim();inp.classList.remove('correct','wrong');
+    inp.parentElement.querySelector('.opp-ans').style.display='none';
+    if(v===inp.dataset.a){inp.classList.add('correct');c++}
+    else{inp.classList.add('wrong');inp.parentElement.querySelector('.opp-ans').style.display='inline'}
+  });
+  document.getElementById('oppMsg').textContent='批改結果：'+c+' / '+oppInps.length+' 正確'+(c===oppInps.length?' 🎉 全對！太棒了！':'');
+}
+function showOpp(){
+  oppInps.forEach(inp=>{
+    inp.value=inp.dataset.a;inp.classList.remove('wrong');inp.classList.add('correct');
+    inp.parentElement.querySelector('.opp-ans').style.display='none';
+  });
+  document.getElementById('oppMsg').textContent='已顯示所有答案。';
+}
+function resetOpp(){
+  oppInps.forEach(inp=>{
+    inp.value='';inp.classList.remove('correct','wrong');
+    inp.parentElement.querySelector('.opp-ans').style.display='none';
+  });
+  document.getElementById('oppMsg').textContent='尚未批改。';
+}
+
+/* ========== Init ========== */
+blanksB=buildFill(basicSegs,'fillBasic');
+blanksA=buildFill(advSegs,'fillAdv');
+buildVocab();buildRad();buildOpp();
+</script>
+</body>
+</html>
