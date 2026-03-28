@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSP1 · Method School 小一學習平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card-radius: 18px;
+    --shadow: 0 4px 20px rgba(0,0,0,.07);
+    --font: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: #222;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #4a6cf7 0%, #6c3ecf 100%);
+    color: #fff;
+    text-align: center;
+    padding: 40px 20px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute; bottom: -30px; left: 0; right: 0;
+    height: 60px;
+    background: var(--bg);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  header h1 { font-size: 2rem; font-weight: 900; letter-spacing: .03em; }
+  header p  { margin-top: 8px; font-size: 1rem; opacity: .9; }
+  .badge {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba(255,255,255,.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: .85rem;
+  }
+
+  /* ── Main grid ── */
+  main {
+    max-width: 960px;
+    margin: -10px auto 40px;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  /* ── Subject Card ── */
+  .card {
+    background: #fff;
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,.1); }
+
+  .card-header {
+    padding: 22px 22px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-header .icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .card-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .card-header .sub { font-size: .82rem; color: #888; margin-top: 2px; }
+  .card-header .toggle {
+    margin-left: auto;
+    font-size: 1.3rem;
+    transition: transform .3s;
+    color: #aaa;
+  }
+  .card.open .toggle { transform: rotate(180deg); }
+
+  .card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s ease, padding .3s;
+    padding: 0 22px;
+  }
+  .card.open .card-body {
+    max-height: 600px;
+    padding: 0 22px 20px;
+  }
+
+  .lesson-list { list-style: none; }
+  .lesson-list li { margin-bottom: 6px; }
+  .lesson-list a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #333;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: .93rem;
+    background: #f7f8fc;
+    transition: background .15s;
+  }
+  .lesson-list a:hover { background: #eef0fb; }
+  .lesson-list .link-icon { font-size: 1.05rem; }
+  .lesson-list .tag {
+    margin-left: auto;
+    font-size: .7rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tag-new  { background: #e8f9ee; color: #1b8a4a; }
+  .tag-v    { background: #eef0fb; color: #5a6acf; }
+  .tag-soon { background: #fff5e0; color: #b8860b; }
+
+  .coming-soon {
+    text-align: center;
+    padding: 18px 0 6px;
+    color: #bbb;
+    font-size: .9rem;
+  }
+
+  /* ── Colours per subject ── */
+  .bg-chinese  { background: #fff0f0; }
+  .bg-english  { background: #e8f4ff; }
+  .bg-putonghua{ background: #fff8e1; }
+  .bg-maths    { background: #eafaf1; }
+  .bg-human    { background: #f3eaff; }
+  .bg-science  { background: #e8fbfa; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 24px 16px 32px;
+    font-size: .8rem;
+    color: #aaa;
+  }
+  footer a { color: #7b8adb; text-decoration: none; }
+
+  /* ── Quick-search ── */
+  .search-wrap {
+    max-width: 420px;
+    margin: 0 auto 8px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 12px 18px 12px 44px;
+    border: 2px solid #e0e3ef;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: var(--font);
+    outline: none;
+    transition: border-color .2s;
+    background: #fff;
+  }
+  .search-wrap input:focus { border-color: #6c3ecf; }
+  .search-wrap .s-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 1.15rem; color: #bbb; pointer-events: none;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.5rem; }
+    .subject-grid { grid-template-columns: 1fr; }
+    .card-header .icon { width: 44px; height: 44px; font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ HEADER ══════ -->
+<header>
+  <h1>📚 MSP1 學習平台</h1>
+  <p>Method School · 小學一年級</p>
+  <span class="badge">🏫 Primary 1 — Interactive Learning Hub</span>
+</header>
+
+<!-- ══════ MAIN ══════ -->
+<main>
+  <div class="search-wrap">
+    <span class="s-icon">🔍</span>
+    <input type="text" id="search" placeholder="搜尋課題 Search lessons…" autocomplete="off">
+  </div>
+
+  <div class="subject-grid" id="grid">
+
+    <!-- ─── 中文 ─── -->
+    <div class="card open" data-subject="中文 Chinese">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-chinese">📖</div>
+        <div>
+          <h2>中文</h2>
+          <div class="sub">Chinese Language</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <ul class="lesson-list">
+          <li data-keywords="小火車 第十三課 火部 認讀 聽寫">
+            <a href="chinese/L13-小火車-V4.html">
+              <span class="link-icon">🚂</span>
+              第13課 · 小火車（含標點朗讀 · iPad 強化）
+              <span class="tag tag-new">最新</span>
+            </a>
+          </li>
+          <li data-keywords="小火車 第十三課 標點朗讀">
+            <a href="chinese/L13-小火車-V3.html">
+              <span class="link-icon">🚂</span>
+              第13課 · 小火車（含標點朗讀）
+              <span class="tag tag-v">V3</span>
+            </a>
+          </li>
+          <li data-keywords="小火車 第十三課 iPad 語音">
+            <a href="chinese/L13-小火車-V2.html">
+              <span class="link-icon">🚂</span>
+              第13課 · 小火車（改良語音 iPad）
+              <span class="tag tag-v">V2</span>
+            </a>
+          </li>
+          <li data-keywords="小火車 第十三課 原版">
+            <a href="chinese/L13-小火車.html">
+              <span class="link-icon">🚂</span>
+              第13課 · 小火車（原版）
+              <span class="tag tag-v">V1</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── English ─── -->
+    <div class="card open" data-subject="英文 English">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-english">🔤</div>
+        <div>
+          <h2>English</h2>
+          <div class="sub">英文</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <ul class="lesson-list">
+          <li data-keywords="fruit dictation random matching">
+            <a href="english/Dictation4-dictation-random.html">
+              <span class="link-icon">🎲</span>
+              Dictation 4 · Fruit — Dictation &amp; Matching (Random)
+              <span class="tag tag-new">最新</span>
+            </a>
+          </li>
+          <li data-keywords="fruit dictation matching">
+            <a href="english/Dictation4-dictation.html">
+              <span class="link-icon">✍️</span>
+              Dictation 4 · Fruit — Dictation &amp; Matching
+            </a>
+          </li>
+          <li data-keywords="fruit sentences vocabulary Part B">
+            <a href="english/Dictation4-PartB.html">
+              <span class="link-icon">🗣️</span>
+              Dictation 4 · Fruit — Vocab &amp; Sentences (Listen)
+            </a>
+          </li>
+          <li data-keywords="fruit vocabulary listen">
+            <a href="english/Dictation4-vocab.html">
+              <span class="link-icon">🍎</span>
+              Dictation 4 · Fruit — Vocabulary (Listen)
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── 普通話 ─── -->
+    <div class="card" data-subject="普通話 Putonghua">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-putonghua">🗣️</div>
+        <div>
+          <h2>普通話</h2>
+          <div class="sub">Putonghua</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <ul class="lesson-list">
+          <li data-keywords="picture cards 普通話 粵語 cantonese">
+            <a href="putonghua/PictureCards-v2.html">
+              <span class="link-icon">🖼️</span>
+              圖卡認讀 · 普通話 / 粵語 雙語版
+              <span class="tag tag-new">最新</span>
+            </a>
+          </li>
+          <li data-keywords="picture cards 普通話 mandarin">
+            <a href="putonghua/PictureCards.html">
+              <span class="link-icon">🖼️</span>
+              圖卡認讀 · 普通話
+              <span class="tag tag-v">V1</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ─── 數學 ─── -->
+    <div class="card" data-subject="數學 Maths">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-maths">🔢</div>
+        <div>
+          <h2>數學</h2>
+          <div class="sub">Mathematics</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="coming-soon">📦 即將推出 Coming soon…</p>
+      </div>
+    </div>
+
+    <!-- ─── 人文 ─── -->
+    <div class="card" data-subject="人文 Humanities">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-human">🌏</div>
+        <div>
+          <h2>人文</h2>
+          <div class="sub">Humanities</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="coming-soon">📦 即將推出 Coming soon…</p>
+      </div>
+    </div>
+
+    <!-- ─── 科學 ─── -->
+    <div class="card" data-subject="科學 Science">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="icon bg-science">🔬</div>
+        <div>
+          <h2>科學</h2>
+          <div class="sub">Science</div>
+        </div>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="coming-soon">📦 即將推出 Coming soon…</p>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</main>
+
+<!-- ══════ FOOTER ══════ -->
+<footer>
+  <p>MSP1 Learning Hub · Method School Primary 1</p>
+  <p style="margin-top:4px;">Made with ❤️ for young learners &nbsp;|&nbsp; <a href="https://github.com/" target="_blank">GitHub Repo</a></p>
+  <p style="margin-top:8px;font-size:.72rem;">Last updated: 2026-03</p>
+</footer>
+
+<!-- ══════ JS ══════ -->
+<script>
+/* Toggle card open/close */
+function toggleCard(headerEl) {
+  headerEl.closest('.card').classList.toggle('open');
+}
+
+/* Quick search / filter */
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(card => {
+    if (!q) {
+      card.style.display = '';
+      card.querySelectorAll('.lesson-list li').forEach(li => li.style.display = '');
+      return;
+    }
+    const subjectMatch = (card.dataset.subject || '').toLowerCase().includes(q);
+    let anyLesson = false;
+    card.querySelectorAll('.lesson-list li').forEach(li => {
+      const text = (li.textContent + ' ' + (li.dataset.keywords || '')).toLowerCase();
+      const show = text.includes(q) || subjectMatch;
+      li.style.display = show ? '' : 'none';
+      if (show) anyLesson = true;
+    });
+    /* Show card if subject matches or any lesson matches, or has coming-soon */
+    const hasComing = !!card.querySelector('.coming-soon');
+    card.style.display = (subjectMatch || anyLesson || (hasComing && subjectMatch)) ? '' : 'none';
+    if (anyLesson || subjectMatch) card.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
