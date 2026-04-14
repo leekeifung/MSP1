@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LOE 1B Unit 3 — Dictation & Matching (Randomized)</title>
+<style>
+    :root {
+        color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: #f6f8fb;
+        color: #0f172a;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+    h1, h2, h3 {
+        margin: 0 0 12px;
+        font-weight: 700;
+    }
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.15rem; }
+    h3 { font-size: 1.05rem; }
+    .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+    }
+    .subcard {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 10px;
+        background: #fafbff;
+    }
+    .controls, .btn-row, .sliders {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    .btn {
+        border: 1px solid #cbd5e1;
+        background: #eef2ff;
+        color: #1d4ed8;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.15s ease;
+    }
+    .btn:hover { border-color: #94a3b8; }
+    .btn.secondary {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+    .list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .item {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .item-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #e0f2fe;
+        color: #0369a1;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .status {
+        margin-left: auto;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    .status.ok { color: #0f9b4c; }
+    .status.bad { color: #d32f2f; }
+    input[type="text"], select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dce2ef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type="text"]:focus, select:focus {
+        outline: none;
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+    }
+    .correct {
+        border-color: #22c55e !important;
+        background: #ecfdf3;
+    }
+    .wrong {
+        border-color: #ef4444 !important;
+        background: #fef2f2;
+    }
+    .note {
+        font-size: 0.9rem;
+        color: #475569;
+    }
+    .sliders label {
+        font-weight: 600;
+        margin-right: 6px;
+    }
+    .slider-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        color: #0f172a;
+        font-weight: 600;
+    }
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    /* Pictures */
+    .item-body {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: center;
+    }
+    .pic-box {
+        width: 72px;
+        height: 72px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+    }
+    .pic-box svg {
+        width: 64px;
+        height: 64px;
+        display: block;
+    }
+    @media (max-width: 640px) {
+        .item-header { gap: 6px; }
+        .btn { width: 100%; text-align: center; }
+        .btn-row { flex-direction: column; align-items: stretch; }
+        .controls { flex-direction: column; align-items: stretch; }
+        .sliders { flex-direction: column; align-items: flex-start; }
+        .item-body { grid-template-columns: 1fr; }
+        .pic-box { width: 64px; height: 64px; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <header class="card" style="position: sticky; top: 0; z-index: 5; backdrop-filter: blur(6px);">
+        <h1>LOE 1B Unit 3 — Dictation & Matching (Randomized)</h1>
+        <div class="note">Uses your browser’s speech synthesis. If voices are missing, interact with the page or tap “Reload voices”.</div>
+        <div class="subcard">
+            <div class="controls" style="gap: 12px;">
+                <div style="flex: 1 1 220px;">
+                    <label for="voiceSelect" style="font-weight:600;">Voice</label><br />
+                    <select id="voiceSelect"></select>
+                </div>
+                <div class="sliders" style="flex: 1 1 220px;">
+                    <div class="slider-wrap">
+                        <label for="rateRange">Speed</label>
+                        <input id="rateRange" type="range" min="0.6" max="1.4" step="0.05" value="0.95" />
+                        <span id="rateVal" class="pill">0.95</span>
+                    </div>
+                </div>
+                <div class="sliders" style="flex: 1 1 220px;">
+                    <div class="slider-wrap">
+                        <label for="pitchRange">Pitch</label>
+                        <input id="pitchRange" type="range" min="0.6" max="1.4" step="0.05" value="1.00" />
+                        <span id="pitchVal" class="pill">1.00</span>
+                    </div>
+                </div>
+                <button class="btn secondary" id="reloadVoices">Reload voices</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- A. Vocabulary -->
+    <section class="card">
+        <div class="section-title">
+            <h2>A. Vocabulary — Dictation (random order)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkDictation('vocab')">Check all</button>
+            <button class="btn secondary" onclick="showDictationAnswers('vocab')">Show all answers</button>
+            <button class="btn secondary" onclick="resetDictation('vocab')">Reset</button>
+        </div>
+        <div id="vocab-dictation" class="list"></div>
+    </section>
+
+    <section class="card">
+        <div class="section-title">
+            <h2>A. Vocabulary — Matching (random order, enlarged dropdown)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkMatching('vocab')">Check matching</button>
+            <button class="btn secondary" onclick="showMatchingAnswers('vocab')">Show all answers</button>
+            <button class="btn secondary" onclick="resetMatching('vocab')">Reset</button>
+        </div>
+        <div id="vocab-matching" class="list"></div>
+    </section>
+
+    <!-- B. Sentences -->
+    <section class="card">
+        <div class="section-title">
+            <h2>B. Sentences — Dictation (random order)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkDictation('sent')">Check all</button>
+            <button class="btn secondary" onclick="showDictationAnswers('sent')">Show all answers</button>
+            <button class="btn secondary" onclick="resetDictation('sent')">Reset</button>
+        </div>
+        <div id="sent-dictation" class="list"></div>
+    </section>
+
+    <section class="card">
+        <div class="section-title">
+            <h2>B. Sentences — Matching (random order, listen and choose)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkMatching('sent')">Check matching</button>
+            <button class="btn secondary" onclick="showMatchingAnswers('sent')">Show all answers</button>
+            <button class="btn secondary" onclick="resetMatching('sent')">Reset</button>
+        </div>
+        <div id="sent-matching" class="list"></div>
+    </section>
+
+    <!-- C. Poem -->
+    <section class="card">
+        <div class="section-title">
+            <h2>C. Poem — Dictation (A sad robot)</h2>
+            <span class="pill">By Danny, Class 5E</span>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkDictation('poem')">Check all</button>
+            <button class="btn secondary" onclick="showDictationAnswers('poem')">Show all answers</button>
+            <button class="btn secondary" onclick="resetDictation('poem')">Reset</button>
+        </div>
+        <div id="poem-dictation" class="list"></div>
+    </section>
+
+    <section class="card">
+        <div class="section-title">
+            <h2>C. Poem — Matching (listen and choose)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkMatching('poem')">Check matching</button>
+            <button class="btn secondary" onclick="showMatchingAnswers('poem')">Show all answers</button>
+            <button class="btn secondary" onclick="resetMatching('poem')">Reset</button>
+        </div>
+        <div id="poem-matching" class="list"></div>
+    </section>
+
+    <div class="note" style="padding: 12px; text-align: center;">Ready.</div>
+</div>
+
+<script>
+/* ----------------- Data ----------------- */
+const data = {
+    vocab: [
+        "a ball",
+        "a doll",
+        "a puzzle",
+        "a robot",
+        "a teddy",
+        "a car",
+        "a dinosaur",
+        "a plane",
+        "a train",
+        "a house"
+    ],
+    sent: [
+        "I have a pink doll.",
+        "It has a red bow tie.",
+        "Do not throw your toys away.",
+        "Find them a new home.",
+        "They have windows and doors.",
+        "The wheels are black."
+    ],
+    poem: [
+        "I live in a box.",
+        "My owner's name is James.",
+        "I am a robot.",
+        "My name is Scott.",
+        "Find me a new home, please.",
+        "I like fun and games.",
+        "My body is blue and white.",
+        "My eyes are orange and bright."
+    ]
+};
+
+/* ----------------- Inline SVG pictures for vocab ----------------- */
+const vocabPics = {
+    "a ball": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <radialGradient id="gball" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffd7a3"/>
+          <stop offset="60%" stop-color="#fb923c"/>
+          <stop offset="100%" stop-color="#f97316"/>
+        </radialGradient>
+      </defs>
+      <circle cx="32" cy="32" r="26" fill="url(#gball)" stroke="#f97316" stroke-width="2"/>
+      <path d="M8 30c10 2 20 2 30 0s20-2 28 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <path d="M20 10c-4 8-4 16 0 24s10 14 18 18" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    </svg>
+    `,
+    "a doll": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="22" r="12" fill="#fecdd3" stroke="#fb7185" stroke-width="2"/>
+      <circle cx="26" cy="20" r="2" fill="#0f172a"/>
+      <circle cx="38" cy="20" r="2" fill="#0f172a"/>
+      <path d="M28 26c2 2 6 2 8 0" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M16 50c0-9 7-16 16-16s16 7 16 16" fill="#bfdbfe" stroke="#60a5fa" stroke-width="2"/>
+      <path d="M12 24c2-8 8-14 20-14s18 6 20 14" fill="none" stroke="#f472b6" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+    </svg>
+    `,
+    "a puzzle": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="6" y="6" width="24" height="24" rx="4" fill="#c4b5fd" stroke="#7c3aed" stroke-width="2"/>
+      <rect x="34" y="6" width="24" height="24" rx="4" fill="#a5f3fc" stroke="#06b6d4" stroke-width="2"/>
+      <rect x="6" y="34" width="24" height="24" rx="4" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+      <rect x="34" y="34" width="24" height="24" rx="4" fill="#bbf7d0" stroke="#22c55e" stroke-width="2"/>
+      <circle cx="18" cy="18" r="5" fill="#7c3aed" opacity="0.8"/>
+      <circle cx="46" cy="18" r="5" fill="#06b6d4" opacity="0.8"/>
+      <circle cx="18" cy="46" r="5" fill="#f59e0b" opacity="0.8"/>
+      <circle cx="46" cy="46" r="5" fill="#22c55e" opacity="0.8"/>
+    </svg>
+    `,
+    "a robot": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="18" y="16" width="28" height="26" rx="4" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+      <rect x="14" y="28" width="36" height="20" rx="4" fill="#c7d2fe" stroke="#6366f1" stroke-width="2"/>
+      <circle cx="26" cy="26" r="4" fill="#0f172a"/>
+      <circle cx="38" cy="26" r="4" fill="#0f172a"/>
+      <rect x="28" y="32" width="8" height="6" rx="2" fill="#f59e0b"/>
+      <rect x="22" y="46" width="20" height="6" rx="2" fill="#0ea5e9"/>
+      <line x1="32" y1="12" x2="32" y2="6" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="6" r="3" fill="#f97316"/>
+    </svg>
+    `,
+    "a teddy": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="22" cy="18" r="8" fill="#f5d0a9" stroke="#d97706" stroke-width="2"/>
+      <circle cx="42" cy="18" r="8" fill="#f5d0a9" stroke="#d97706" stroke-width="2"/>
+      <circle cx="32" cy="30" r="14" fill="#fcd7b6" stroke="#d97706" stroke-width="2"/>
+      <circle cx="28" cy="28" r="3" fill="#0f172a"/>
+      <circle cx="36" cy="28" r="3" fill="#0f172a"/>
+      <path d="M30 34c2 2 4 2 6 0" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="20" cy="46" r="6" fill="#f5d0a9" stroke="#d97706" stroke-width="2"/>
+      <circle cx="44" cy="46" r="6" fill="#f5d0a9" stroke="#d97706" stroke-width="2"/>
+    </svg>
+    `,
+    "a car": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="10" y="26" width="44" height="16" rx="3" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+      <rect x="18" y="18" width="28" height="12" rx="3" fill="#93c5fd" stroke="#2563eb" stroke-width="2"/>
+      <circle cx="20" cy="46" r="6" fill="#0f172a"/>
+      <circle cx="44" cy="46" r="6" fill="#0f172a"/>
+      <circle cx="20" cy="46" r="3" fill="#e2e8f0"/>
+      <circle cx="44" cy="46" r="3" fill="#e2e8f0"/>
+      <rect x="24" y="20" width="6" height="8" rx="1" fill="#e0f2fe"/>
+      <rect x="34" y="20" width="6" height="8" rx="1" fill="#e0f2fe"/>
+    </svg>
+    `,
+    "a dinosaur": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M14 46c0-10 8-18 20-18 8 0 12-4 12-10 0-2-1-4-2-6h6c2 2 4 6 4 10 0 10-8 18-18 18h-4v6H18v-4l-4 4v-10z" fill="#4ade80" stroke="#16a34a" stroke-width="2" />
+      <circle cx="40" cy="18" r="2" fill="#0f172a"/>
+      <path d="M24 38c2 2 6 4 10 4" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    `,
+    "a plane": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M10 30l44-10-8 12 8 12-44-10z" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2" />
+      <path d="M30 24l-4-10" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/>
+      <path d="M30 40l-4 10" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="40" cy="30" r="3" fill="#4f46e5"/>
+    </svg>
+    `,
+    "a train": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="10" y="24" width="36" height="18" rx="3" fill="#fecdd3" stroke="#f43f5e" stroke-width="2"/>
+      <rect x="34" y="16" width="12" height="8" rx="2" fill="#fda4af" stroke="#f43f5e" stroke-width="2"/>
+      <rect x="48" y="26" width="6" height="10" rx="1.5" fill="#94a3b8"/>
+      <circle cx="18" cy="46" r="5" fill="#0f172a"/>
+      <circle cx="34" cy="46" r="5" fill="#0f172a"/>
+      <circle cx="18" cy="46" r="2.5" fill="#e2e8f0"/>
+      <circle cx="34" cy="46" r="2.5" fill="#e2e8f0"/>
+      <rect x="16" y="28" width="10" height="6" rx="1" fill="#fff"/>
+      <rect x="28" y="28" width="10" height="6" rx="1" fill="#fff"/>
+    </svg>
+    `,
+    "a house": `
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M12 30 32 14 52 30v18a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V30z" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+      <rect x="26" y="34" width="12" height="16" rx="1.5" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>
+      <rect x="18" y="34" width="6" height="6" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>
+      <rect x="40" y="34" width="6" height="6" fill="#f8fafc" stroke="#1e293b" stroke-width="2"/>
+      <path d="M30 42h4" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    `
+};
+
+/* ----------------- State ----------------- */
+const state = {
+    vocabDictOrder: [],
+    vocabMatchOrder: [],
+    sentDictOrder: [],
+    sentMatchOrder: [],
+    poemDictOrder: [],
+    poemMatchOrder: [],
+    vocabOptions: [],
+    sentOptions: [],
+    poemOptions: [],
+    voices: []
+};
+
+/* ----------------- Helpers ----------------- */
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function normalize(str) {
+    return (str || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+/* ----------------- Speech ----------------- */
+function loadVoices() {
+    const list = speechSynthesis.getVoices();
+    if (list.length) {
+        state.voices = list;
+        populateVoiceSelect();
+    }
+}
+
+function populateVoiceSelect() {
+    const sel = document.getElementById("voiceSelect");
+    const prev = sel.value;
+    sel.innerHTML = "";
+    const autoOpt = document.createElement("option");
+    autoOpt.value = "";
+    autoOpt.textContent = "Auto (browser default)";
+    sel.appendChild(autoOpt);
+
+    state.voices.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.name;
+        opt.textContent = `${v.name} — ${v.lang}`;
+        sel.appendChild(opt);
+    });
+    if ([...sel.options].some(o => o.value === prev)) {
+        sel.value = prev;
+    }
+}
+
+function getSelectedVoice() {
+    const name = document.getElementById("voiceSelect").value;
+    if (!name) return null;
+    return state.voices.find(v => v.name === name) || null;
+}
+
+function speak(text) {
+    if (!window.speechSynthesis) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    const v = getSelectedVoice();
+    if (v) utter.voice = v;
+    const rate = parseFloat(document.getElementById("rateRange").value || "1");
+    const pitch = parseFloat(document.getElementById("pitchRange").value || "1");
+    utter.rate = rate;
+    utter.pitch = pitch;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+}
+
+function speakFromButton(btn) {
+    const text = btn.getAttribute("data-text") || "";
+    speak(text);
+}
+
+/* ----------------- Rendering ----------------- */
+function picForVocab(text) {
+    return vocabPics[text] || "";
+}
+
+function renderDictation(sectionKey) {
+    const container = document.getElementById(`${sectionKey}-dictation`);
+    const order = state[`${sectionKey}DictOrder`];
+    const items = data[sectionKey];
+
+    const html = order.map((idx, i) => {
+        const text = items[idx];
+        const pic = sectionKey === "vocab" ? picForVocab(text) : "";
+        const picBox = pic
+            ? `<div class="pic-box">${pic}</div>`
+            : "";
+        return `
+        <div class="item">
+            <div class="item-header">
+                <span class="badge">#${i + 1}</span>
+                <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
+                <span class="status" id="${sectionKey}-dict-status-${i}"></span>
+            </div>
+            <div class="item-body">
+                ${picBox}
+                <input type="text"
+                    id="${sectionKey}-dict-input-${i}"
+                    data-correct="${text.replace(/"/g, '&quot;')}"
+                    aria-label="Type what you hear for item ${i + 1}" />
+            </div>
+        </div>`;
+    }).join("");
+    container.innerHTML = html;
+}
+
+function renderMatching(sectionKey) {
+    const container = document.getElementById(`${sectionKey}-matching`);
+    const order = state[`${sectionKey}MatchOrder`];
+    const items = data[sectionKey];
+    const options = state[`${sectionKey}Options`];
+
+    const html = order.map((idx, i) => {
+        const text = items[idx];
+        const opts = options.map(opt =>
+            `<option value="${opt.replace(/"/g, '&quot;')}">${opt}</option>`
+        ).join("");
+        const pic = sectionKey === "vocab" ? picForVocab(text) : "";
+        const picBox = pic
+            ? `<div class="pic-box">${pic}</div>`
+            : "";
+        return `
+        <div class="item">
+            <div class="item-header">
+                <span class="badge">#${i + 1}</span>
+                <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
+                <span class="status" id="${sectionKey}-match-status-${i}"></span>
+            </div>
+            <div class="item-body">
+                ${picBox}
+                <select id="${sectionKey}-match-select-${i}" data-correct="${text.replace(/"/g, '&quot;')}" aria-label="Choose the matching text for item ${i + 1}">
+                    <option value="">Choose…</option>
+                    ${opts}
+                </select>
+            </div>
+        </div>`;
+    }).join("");
+    container.innerHTML = html;
+}
+
+/* ----------------- Actions ----------------- */
+function checkDictation(sectionKey) {
+    const order = state[`${sectionKey}DictOrder`];
+    order.forEach((_, i) => {
+        const input = document.getElementById(`${sectionKey}-dict-input-${i}`);
+        const status = document.getElementById(`${sectionKey}-dict-status-${i}`);
+        const correct = input.dataset.correct || "";
+        const val = normalize(input.value);
+        const ok = val === normalize(correct);
+        input.classList.remove("correct", "wrong");
+        input.classList.add(ok ? "correct" : "wrong");
+        if (status) {
+            status.textContent = ok ? "✓" : "✗";
+            status.className = ok ? "status ok" : "status bad";
+        }
+    });
+}
+
+function showDictationAnswers(sectionKey) {
+    const order = state[`${sectionKey}DictOrder`];
+    order.forEach((_, i) => {
+        const input = document.getElementById(`${sectionKey}-dict-input-${i}`);
+        const status = document.getElementById(`${sectionKey}-dict-status-${i}`);
+        const correct = input.dataset.correct || "";
+        input.value = correct;
+        input.classList.remove("wrong");
+        input.classList.add("correct");
+        if (status) {
+            status.textContent = "✓ Shown";
+            status.className = "status ok";
+        }
+    });
+}
+
+function resetDictation(sectionKey) {
+    state[`${sectionKey}DictOrder`] = shuffle([...Array(data[sectionKey].length).keys()]);
+    renderDictation(sectionKey);
+}
+
+function checkMatching(sectionKey) {
+    const order = state[`${sectionKey}MatchOrder`];
+    order.forEach((_, i) => {
+        const select = document.getElementById(`${sectionKey}-match-select-${i}`);
+        const status = document.getElementById(`${sectionKey}-match-status-${i}`);
+        const correct = select.dataset.correct || "";
+        const val = select.value;
+        const ok = normalize(val) === normalize(correct);
+        select.classList.remove("correct", "wrong");
+        select.classList.add(ok ? "correct" : "wrong");
+        if (status) {
+            status.textContent = ok ? "✓" : "✗";
+            status.className = ok ? "status ok" : "status bad";
+        }
+    });
+}
+
+function showMatchingAnswers(sectionKey) {
+    const order = state[`${sectionKey}MatchOrder`];
+    order.forEach((_, i) => {
+        const select = document.getElementById(`${sectionKey}-match-select-${i}`);
+        const status = document.getElementById(`${sectionKey}-match-status-${i}`);
+        const correct = select.dataset.correct || "";
+        select.value = correct;
+        select.classList.remove("wrong");
+        select.classList.add("correct");
+        if (status) {
+            status.textContent = "✓ Shown";
+            status.className = "status ok";
+        }
+    });
+}
+
+function resetMatching(sectionKey) {
+    state[`${sectionKey}MatchOrder`] = shuffle([...Array(data[sectionKey].length).keys()]);
+    state[`${sectionKey}Options`] = shuffle(data[sectionKey]);
+    renderMatching(sectionKey);
+}
+
+/* ----------------- Init ----------------- */
+function initOrders() {
+    state.vocabDictOrder = shuffle([...Array(data.vocab.length).keys()]);
+    state.vocabMatchOrder = shuffle([...Array(data.vocab.length).keys()]);
+    state.sentDictOrder = shuffle([...Array(data.sent.length).keys()]);
+    state.sentMatchOrder = shuffle([...Array(data.sent.length).keys()]);
+    state.poemDictOrder = shuffle([...Array(data.poem.length).keys()]);
+    state.poemMatchOrder = shuffle([...Array(data.poem.length).keys()]);
+    state.vocabOptions = shuffle(data.vocab);
+    state.sentOptions = shuffle(data.sent);
+    state.poemOptions = shuffle(data.poem);
+}
+
+function renderAll() {
+    renderDictation("vocab");
+    renderMatching("vocab");
+    renderDictation("sent");
+    renderMatching("sent");
+    renderDictation("poem");
+    renderMatching("poem");
+}
+
+function setupSliders() {
+    const rate = document.getElementById("rateRange");
+    const pitch = document.getElementById("pitchRange");
+    const rateVal = document.getElementById("rateVal");
+    const pitchVal = document.getElementById("pitchVal");
+    rate.addEventListener("input", () => rateVal.textContent = rate.value);
+    pitch.addEventListener("input", () => pitchVal.textContent = pitch.value);
+}
+
+function setupVoiceEvents() {
+    document.getElementById("reloadVoices").addEventListener("click", () => {
+        speechSynthesis.cancel();
+        loadVoices();
+    });
+    if ("speechSynthesis" in window) {
+        speechSynthesis.onvoiceschanged = () => {
+            loadVoices();
+        };
+        loadVoices();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    initOrders();
+    renderAll();
+    setupSliders();
+    setupVoiceEvents();
+});
+</script>
+</body>
+</html>
