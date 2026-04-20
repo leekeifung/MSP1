@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LOE 1B Unit 3 — Dictation & Matching (Randomized)</title>
 <style>
-    :root {
-        color-scheme: light;
-    }
+    :root { color-scheme: light; }
     * { box-sizing: border-box; }
     body {
         margin: 0;
@@ -21,10 +19,7 @@
         margin: 0 auto;
         padding: 16px;
     }
-    h1, h2, h3 {
-        margin: 0 0 12px;
-        font-weight: 700;
-    }
+    h1, h2, h3 { margin: 0 0 12px; font-weight: 700; }
     h1 { font-size: 1.35rem; }
     h2 { font-size: 1.15rem; }
     h3 { font-size: 1.05rem; }
@@ -60,10 +55,7 @@
         transition: all 0.15s ease;
     }
     .btn:hover { border-color: #94a3b8; }
-    .btn.secondary {
-        background: #e2e8f0;
-        color: #0f172a;
-    }
+    .btn.secondary { background: #e2e8f0; color: #0f172a; }
     .list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
     .item {
         border: 1px solid #e5e7eb;
@@ -100,7 +92,7 @@
     }
     .status.ok { color: #0f9b4c; }
     .status.bad { color: #d32f2f; }
-    input[type="text"], select {
+    input[type="text"], select, textarea {
         width: 100%;
         padding: 10px 12px;
         border: 1px solid #dce2ef;
@@ -108,32 +100,21 @@
         font-size: 1rem;
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    input[type="text"]:focus, select:focus {
+    textarea {
+        min-height: 72px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
         outline: none;
         border-color: #7c3aed;
         box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
     }
-    .correct {
-        border-color: #22c55e !important;
-        background: #ecfdf3;
-    }
-    .wrong {
-        border-color: #ef4444 !important;
-        background: #fef2f2;
-    }
-    .note {
-        font-size: 0.9rem;
-        color: #475569;
-    }
-    .sliders label {
-        font-weight: 600;
-        margin-right: 6px;
-    }
-    .slider-wrap {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+    .correct { border-color: #22c55e !important; background: #ecfdf3; }
+    .wrong { border-color: #ef4444 !important; background: #fef2f2; }
+    .note { font-size: 0.9rem; color: #475569; }
+    .sliders label { font-weight: 600; margin-right: 6px; }
+    .slider-wrap { display: flex; align-items: center; gap: 6px; }
     .pill {
         display: inline-flex;
         align-items: center;
@@ -150,12 +131,16 @@
         gap: 8px;
         flex-wrap: wrap;
     }
-    /* Pictures */
+    /* Pictures and layout */
     .item-body {
         display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-columns: 1fr;
         gap: 12px;
         align-items: center;
+        width: 100%;
+    }
+    .item-body.with-pic {
+        grid-template-columns: auto 1fr;
     }
     .pic-box {
         width: 72px;
@@ -180,6 +165,7 @@
         .controls { flex-direction: column; align-items: stretch; }
         .sliders { flex-direction: column; align-items: flex-start; }
         .item-body { grid-template-columns: 1fr; }
+        .item-body.with-pic { grid-template-columns: 1fr; }
         .pic-box { width: 64px; height: 64px; }
     }
 </style>
@@ -538,9 +524,8 @@ function renderDictation(sectionKey) {
     const html = order.map((idx, i) => {
         const text = items[idx];
         const pic = sectionKey === "vocab" ? picForVocab(text) : "";
-        const picBox = pic
-            ? `<div class="pic-box">${pic}</div>`
-            : "";
+        const picBox = pic ? `<div class="pic-box">${pic}</div>` : "";
+        const bodyClass = pic ? "item-body with-pic" : "item-body";
         return `
         <div class="item">
             <div class="item-header">
@@ -548,12 +533,12 @@ function renderDictation(sectionKey) {
                 <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
                 <span class="status" id="${sectionKey}-dict-status-${i}"></span>
             </div>
-            <div class="item-body">
+            <div class="${bodyClass}">
                 ${picBox}
-                <input type="text"
+                <textarea
                     id="${sectionKey}-dict-input-${i}"
                     data-correct="${text.replace(/"/g, '&quot;')}"
-                    aria-label="Type what you hear for item ${i + 1}" />
+                    aria-label="Type what you hear for item ${i + 1}"></textarea>
             </div>
         </div>`;
     }).join("");
@@ -572,9 +557,8 @@ function renderMatching(sectionKey) {
             `<option value="${opt.replace(/"/g, '&quot;')}">${opt}</option>`
         ).join("");
         const pic = sectionKey === "vocab" ? picForVocab(text) : "";
-        const picBox = pic
-            ? `<div class="pic-box">${pic}</div>`
-            : "";
+        const picBox = pic ? `<div class="pic-box">${pic}</div>` : "";
+        const bodyClass = pic ? "item-body with-pic" : "item-body";
         return `
         <div class="item">
             <div class="item-header">
@@ -582,7 +566,7 @@ function renderMatching(sectionKey) {
                 <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
                 <span class="status" id="${sectionKey}-match-status-${i}"></span>
             </div>
-            <div class="item-body">
+            <div class="${bodyClass}">
                 ${picBox}
                 <select id="${sectionKey}-match-select-${i}" data-correct="${text.replace(/"/g, '&quot;')}" aria-label="Choose the matching text for item ${i + 1}">
                     <option value="">Choose…</option>
