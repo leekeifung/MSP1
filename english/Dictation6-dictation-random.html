@@ -129,12 +129,16 @@
         gap: 8px;
         flex-wrap: wrap;
     }
-    /* Pictures */
+    /* Pictures and layout */
     .item-body {
         display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-columns: 1fr;
         gap: 12px;
         align-items: center;
+        width: 100%;
+    }
+    .item-body.with-pic {
+        grid-template-columns: auto 1fr;
     }
     .pic-box {
         width: 72px;
@@ -159,6 +163,7 @@
         .controls { flex-direction: column; align-items: stretch; }
         .sliders { flex-direction: column; align-items: flex-start; }
         .item-body { grid-template-columns: 1fr; }
+        .item-body.with-pic { grid-template-columns: 1fr; }
         .pic-box { width: 64px; height: 64px; }
     }
 </style>
@@ -243,10 +248,23 @@
         <div id="sent-matching" class="list"></div>
     </section>
 
-    <!-- C. Unseen -->
+    <!-- C. Poem -->
     <section class="card">
         <div class="section-title">
-            <h2>C. Unseen — Dictation (Picture 5 & 6)</h2>
+            <h2>C. Poem — Dictation (A sad robot)</h2>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="checkDictation('poem')">Check all</button>
+            <button class="btn secondary" onclick="showDictationAnswers('poem')">Show all answers</button>
+            <button class="btn secondary" onclick="resetDictation('poem')">Reset</button>
+        </div>
+        <div id="poem-dictation" class="list"></div>
+    </section>
+
+    <!-- D. Unseen -->
+    <section class="card">
+        <div class="section-title">
+            <h2>D. Unseen — Dictation (Picture 5 & 6)</h2>
             <span class="pill">LOE P.57</span>
         </div>
         <div class="btn-row">
@@ -259,7 +277,7 @@
 
     <section class="card">
         <div class="section-title">
-            <h2>C. Unseen — Matching (listen and choose)</h2>
+            <h2>D. Unseen — Matching (listen and choose)</h2>
         </div>
         <div class="btn-row">
             <button class="btn" onclick="checkMatching('unseen')">Check matching</button>
@@ -294,6 +312,12 @@ const data = {
         "It has short legs.",
         "The hens are under the tree.",
         "The ducks are on the pond."
+    ],
+    poem: [
+        "My name is Scott.",
+        "My body is blue and white.",
+        "I like fun and games.",
+        "My eyes are orange and bright."
     ],
     unseen: [
         // Picture 5
@@ -428,6 +452,7 @@ const state = {
     vocabMatchOrder: [],
     sentDictOrder: [],
     sentMatchOrder: [],
+    poemDictOrder: [],
     unseenDictOrder: [],
     unseenMatchOrder: [],
     vocabOptions: [],
@@ -520,6 +545,7 @@ function renderDictation(sectionKey) {
         const text = items[idx];
         const pic = sectionKey === "vocab" ? picForVocab(text) : "";
         const picBox = pic ? `<div class="pic-box">${pic}</div>` : "";
+        const bodyClass = pic ? "item-body with-pic" : "item-body";
         return `
         <div class="item">
             <div class="item-header">
@@ -527,7 +553,7 @@ function renderDictation(sectionKey) {
                 <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
                 <span class="status" id="${sectionKey}-dict-status-${i}"></span>
             </div>
-            <div class="item-body">
+            <div class="${bodyClass}">
                 ${picBox}
                 <input type="text"
                     id="${sectionKey}-dict-input-${i}"
@@ -552,6 +578,7 @@ function renderMatching(sectionKey) {
         ).join("");
         const pic = sectionKey === "vocab" ? picForVocab(text) : "";
         const picBox = pic ? `<div class="pic-box">${pic}</div>` : "";
+        const bodyClass = pic ? "item-body with-pic" : "item-body";
         return `
         <div class="item">
             <div class="item-header">
@@ -559,7 +586,7 @@ function renderMatching(sectionKey) {
                 <button class="btn secondary" data-text="${text.replace(/"/g, '&quot;')}" onclick="speakFromButton(this)">▶ Play</button>
                 <span class="status" id="${sectionKey}-match-status-${i}"></span>
             </div>
-            <div class="item-body">
+            <div class="${bodyClass}">
                 ${picBox}
                 <select id="${sectionKey}-match-select-${i}" data-correct="${text.replace(/"/g, '&quot;')}" aria-label="Choose the matching text for item ${i + 1}">
                     <option value="">Choose…</option>
@@ -655,6 +682,7 @@ function initOrders() {
     state.vocabMatchOrder = shuffle([...Array(data.vocab.length).keys()]);
     state.sentDictOrder = shuffle([...Array(data.sent.length).keys()]);
     state.sentMatchOrder = shuffle([...Array(data.sent.length).keys()]);
+    state.poemDictOrder = shuffle([...Array(data.poem.length).keys()]);
     state.unseenDictOrder = shuffle([...Array(data.unseen.length).keys()]);
     state.unseenMatchOrder = shuffle([...Array(data.unseen.length).keys()]);
     state.vocabOptions = shuffle(data.vocab);
@@ -667,6 +695,7 @@ function renderAll() {
     renderMatching("vocab");
     renderDictation("sent");
     renderMatching("sent");
+    renderDictation("poem");
     renderDictation("unseen");
     renderMatching("unseen");
 }
