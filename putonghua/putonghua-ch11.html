@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>普通话 Chapter 11 · z c s · zi ci si</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #f6f8fb;
+    color: #0f172a;
+    line-height: 1.6;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  h1, h2, h3 { margin: 0 0 12px; font-weight: 700; }
+  h1 { font-size: 1.35rem; }
+  h2 { font-size: 1.1rem; }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+  }
+  .subcard {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+    background: #fafbff;
+  }
+  .controls, .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn {
+    border: 1px solid #cbd5e1;
+    background: #eef2ff;
+    color: #1d4ed8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { border-color: #94a3b8; }
+  .btn.secondary { background: #e2e8f0; color: #0f172a; }
+  .list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .item {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: #0f172a;
+    font-weight: 600;
+    gap: 6px;
+  }
+  .tone4 { background: #fee2e2; color: #b91c1c; }
+  .hanzi { font-size: 1.15rem; font-weight: 700; }
+  .pinyin { color: #475569; font-weight: 600; letter-spacing: 0.3px; }
+  .hint { font-size: 1.2rem; }
+  .section-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .note { font-size: 0.92rem; color: #475569; }
+  @media (max-width: 640px) {
+    .btn { width: 100%; text-align: center; }
+    .btn-row, .controls { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="card">
+    <h1>普通话 Chapter 11 · 声母 z c s · 整体认读音节 zi ci si</h1>
+    <div class="note">选择「普通话」声音后，点击播放练习。语速可选 0.2×–1×。浏览器需支持语音合成；若未播放，请在本地浏览器打开或点击“刷新声音”。</div>
+    <div class="subcard">
+      <div class="controls">
+        <div style="flex:1 1 220px;">
+          <label for="voiceSelect" style="font-weight:600;">选择普通话声音</label><br/>
+          <select id="voiceSelect" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px;"></select>
+        </div>
+        <div style="flex:1 1 220px;">
+          <label for="rateSelect" style="font-weight:600;">语速</label><br/>
+          <select id="rateSelect" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px;">
+            <option value="0.2">0.2×</option>
+            <option value="0.3">0.3×</option>
+            <option value="0.5">0.5×</option>
+            <option value="0.7">0.7×</option>
+            <option value="0.9" selected>0.9×</option>
+            <option value="1">1.0×</option>
+          </select>
+        </div>
+        <button class="btn secondary" id="reloadVoices">刷新声音</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>一、绕口诀 · Z / C / S</h2>
+      <span class="pill">跟读 + 听</span>
+    </div>
+    <div id="rao-list" class="list"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>二、看图拼一拼 · 读一读</h2>
+      <span class="pill">词语跟读</span>
+    </div>
+    <div id="pic-list" class="list"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>三、听一听 · 标出第四声</h2>
+      <span class="pill tone4">标注「第四声」</span>
+    </div>
+    <div id="tone-list" class="list"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>四、声母词语 · z / c / s</h2>
+      <span class="pill">跟读</span>
+    </div>
+    <div id="shengmu-list" class="list"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">
+      <h2>五、整体认读音节 · zi / ci / si</h2>
+      <span class="pill">跟读</span>
+    </div>
+    <div id="zhengti-list" class="list"></div>
+  </section>
+
+  <div class="note" style="padding:12px; text-align:center;">Ready.</div>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const raoKouJue = [
+  { initial: "Z", pinyin: "yī shuāng kuài zi", hanzi: "一双筷子" },
+  { initial: "C", pinyin: "jiān jiān xiǎo cì", hanzi: "尖尖小刺" },
+  { initial: "S", pinyin: "xiǎo cán tǔ sī", hanzi: "小蚕吐丝" }
+];
+
+const picItems = [
+  { hint: "🔤", pinyin: "zì mǔ", hanzi: "字母" },
+  { hint: "👴", pinyin: "zǔ fù", hanzi: "祖父" },
+  { hint: "🏺", pinyin: "cí qì", hanzi: "瓷器" },
+  { hint: "🚀", pinyin: "sù dù", hanzi: "速度" },
+  { hint: "🪱", pinyin: "tǔ sī", hanzi: "吐丝" },
+  { hint: "🧎", pinyin: "zuò xià", hanzi: "坐下" }
+];
+
+const toneItems = [
+  { hanzi: "指", pinyin: "zhǐ", tone: 3 },
+  { hanzi: "吸", pinyin: "xī", tone: 1 },
+  { hanzi: "啄", pinyin: "zhuó", tone: 2 },
+  { hanzi: "芽", pinyin: "yá", tone: 2 },
+  { hanzi: "秒", pinyin: "miǎo", tone: 3 },
+  { hanzi: "松", pinyin: "sōng", tone: 1 },
+  { hanzi: "字", pinyin: "zì", tone: 4 }
+];
+
+const shengmuGroups = [
+  { label: "z", items: [
+    "出租车 · chū zū chē",
+    "足球 · zú qiú",
+    "再见 · zài jiàn",
+    "工作 · gōng zuò"
+  ]},
+  { label: "c", items: [
+    "早操 · zǎo cāo",
+    "词语 · cí yǔ",
+    "小草 · xiǎo cǎo",
+    "厕所 · cè suǒ"
+  ]},
+  { label: "s", items: [
+    "撒手 · sā shǒu",
+    "三四 · sān sì",
+    "洒水 · sǎ shuǐ",
+    "比赛 · bǐ sài"
+  ]}
+];
+
+const zhengtiGroups = [
+  { label: "zi", items: [
+    "滋味 · zī wèi",
+    "紫色 · zǐ sè",
+    "写字 · xiě zì"
+  ]},
+  { label: "ci", items: [
+    "慈爱 · cí ài",
+    "从此 · cóng cǐ",
+    "次序 · cì xù"
+  ]},
+  { label: "si", items: [
+    "司机 · sī jī",
+    "死亡 · sǐ wáng",
+    "四季 · sì jì"
+  ]}
+];
+
+/* ---------- Speech ---------- */
+let voices = [];
+
+function loadVoices() {
+  const list = speechSynthesis.getVoices();
+  if (!list.length) return;
+  voices = list;
+  const sel = document.getElementById("voiceSelect");
+  const prev = sel.value;
+  sel.innerHTML = "";
+  const auto = document.createElement("option");
+  auto.value = "";
+  auto.textContent = "自动 (浏览器默认)";
+  sel.appendChild(auto);
+
+  // Prefer zh voices first
+  const zh = list.filter(v => (v.lang || "").toLowerCase().startsWith("zh"));
+  const rest = list.filter(v => !zh.includes(v));
+  const ordered = [...zh, ...rest];
+
+  ordered.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v.name;
+    opt.textContent = `${v.name} — ${v.lang}`;
+    sel.appendChild(opt);
+  });
+
+  // Auto-select first zh voice if available
+  if (!prev && zh.length) sel.value = zh[0].name;
+  else if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function getSelectedVoice() {
+  const name = document.getElementById("voiceSelect").value;
+  if (!name) return null;
+  return voices.find(v => v.name === name) || null;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  const v = getSelectedVoice();
+  if (v) utter.voice = v;
+  const rate = parseFloat(document.getElementById("rateSelect").value || "1");
+  utter.rate = rate;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+/* ---------- Rendering helpers ---------- */
+function mkItem({index, title, pinyin, hanzi, hint, tone}) {
+  const toneBadge = tone === 4 ? `<span class="pill tone4">第四声</span>` : "";
+  const hintSpan = hint ? `<span class="hint">${hint}</span>` : "";
+  return `
+    <div class="item">
+      <div class="item-header">
+        <span class="badge">#${index + 1}</span>
+        <button class="btn secondary" data-text="${hanzi} ${pinyin}" onclick="speak(this.dataset.text)">▶ 播放</button>
+        ${toneBadge}
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        ${hintSpan}
+        <div>
+          <div class="hanzi">${hanzi}</div>
+          <div class="pinyin">${pinyin}</div>
+          ${title ? `<div class="note" style="margin-top:2px;">${title}</div>` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRao() {
+  const box = document.getElementById("rao-list");
+  box.innerHTML = raoKouJue.map((r,i) =>
+    mkItem({index:i, title:`${r.initial}`, pinyin:r.pinyin, hanzi:r.hanzi})
+  ).join("");
+}
+
+function renderPics() {
+  const box = document.getElementById("pic-list");
+  box.innerHTML = picItems.map((r,i) =>
+    mkItem({index:i, hint:r.hint, pinyin:r.pinyin, hanzi:r.hanzi})
+  ).join("");
+}
+
+function renderTones() {
+  const box = document.getElementById("tone-list");
+  box.innerHTML = toneItems.map((r,i) =>
+    mkItem({index:i, pinyin:r.pinyin, hanzi:r.hanzi, tone:r.tone})
+  ).join("");
+}
+
+function renderShengmu() {
+  const box = document.getElementById("shengmu-list");
+  box.innerHTML = shengmuGroups.map((g, gi) => `
+    <div class="item">
+      <div class="item-header">
+        <span class="badge">${g.label}</span>
+      </div>
+      <div class="list" style="margin-top:4px;">
+        ${g.items.map((txt, j) => {
+          const [hanzi, pinyin] = txt.split(" · ");
+          return mkItem({index:j, pinyin, hanzi});
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderZhengti() {
+  const box = document.getElementById("zhengti-list");
+  box.innerHTML = zhengtiGroups.map((g, gi) => `
+    <div class="item">
+      <div class="item-header">
+        <span class="badge">${g.label}</span>
+      </div>
+      <div class="list" style="margin-top:4px;">
+        ${g.items.map((txt, j) => {
+          const [hanzi, pinyin] = txt.split(" · ");
+          return mkItem({index:j, pinyin, hanzi});
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ---------- Init ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  renderRao();
+  renderPics();
+  renderTones();
+  renderShengmu();
+  renderZhengti();
+
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = () => loadVoices();
+    loadVoices();
+  }
+
+  document.getElementById("reloadVoices").addEventListener("click", () => {
+    if ("speechSynthesis" in window) {
+      speechSynthesis.cancel();
+      loadVoices();
+    }
+  });
+});
+</script>
+</body>
+</html>
