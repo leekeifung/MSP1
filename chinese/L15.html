@@ -27,7 +27,8 @@
       padding: 1.1rem;
     }
     h1 { margin: 0 0 0.4rem; font-size: 1.55rem; font-weight: 800; }
-    h2 { margin: 0 0 0.25rem; font-size: 1.15rem; font-weight: 800; }
+    h2 { margin: 0 0 0.35rem; font-size: 1.18rem; font-weight: 800; }
+    h3 { margin: 0.25rem 0 0.35rem; font-size: 1.05rem; font-weight: 700; }
     p.sub { margin: 0 0 0.6rem; color: #475569; }
     .controls {
       display: flex;
@@ -76,7 +77,6 @@
       background: #fff;
       box-shadow: 0 6px 14px rgba(15,23,42,0.05);
     }
-    .section + .section { margin-top: 1rem; }
     .text-box {
       border: 1px solid #e2e8f0;
       border-radius: 10px;
@@ -120,7 +120,6 @@
       font-size: 0.95rem;
       color: #0f172a;
       background: #f8fafc;
-      border: 1 dashed #cbd5e1;
       border: 1px dashed #cbd5e1;
       border-radius: 9px;
       padding: 0.4rem 0.55rem;
@@ -200,32 +199,64 @@
       box-shadow: 0 4px 10px rgba(15,23,42,0.04);
     }
     .vocab strong { font-size: 1.02rem; }
-    .stroke-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 0.5rem;
-    }
-    .stroke-card {
+    /* Fifth part match */
+    .match-card {
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 0.55rem;
+      padding: 0.7rem;
       background: #fff;
       box-shadow: 0 4px 10px rgba(15,23,42,0.04);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.4rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
     }
-    .stroke-info { display: flex; flex-direction: column; gap: 0.15rem; }
-    .stroke-info .char { font-size: 1.2rem; font-weight: 800; }
-    .stroke-info .pin { color: #475569; font-size: 0.95rem; }
+    .match-top {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .char-box {
+      width: 62px;
+      height: 62px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      display: grid;
+      place-items: center;
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: #f8fafc;
+    }
+    .pin {
+      color: #475569;
+      font-size: 0.95rem;
+    }
+    .options {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .opt {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.28rem 0.55rem;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .opt input { accent-color: #2563eb; }
     @media (max-width: 640px) {
       .row { flex-direction: column; align-items: flex-start; }
       .controls { flex-direction: column; align-items: flex-start; }
       .para-line { gap: 0.3rem; }
       input[type="text"] { width: 100%; }
       .vocab { flex-direction: column; align-items: flex-start; }
-      .stroke-card { flex-direction: column; align-items: flex-start; }
+      .match-top { flex-direction: column; align-items: flex-start; }
+      .char-box { width: 56px; height: 56px; }
     }
   </style>
 </head>
@@ -303,17 +334,19 @@
       <div id="vocabRead" class="vocab-grid"></div>
     </div>
 
-    <!-- 第五部份：基本筆順認讀 -->
+    <!-- 第五部份：基本筆順認讀（配對題） -->
     <div class="section" id="part5">
-      <h2>✒️ 第五部份：基本筆順認讀</h2>
-      <p class="sub">學生認出筆順規則；例字隨機排序並附讀音，點 🔊 可聽。</p>
+      <h2>✒️ 第五部份：基本筆順認讀（配對）</h2>
+      <p class="sub">學生需為每個字配對筆順規則。例字隨機排序並附讀音。</p>
+      <div class="tag gray" style="margin-bottom:0.45rem;">A：先横畫，後貫穿　｜　B：底部橫畫最後寫</div>
       <div class="controls">
+        <button id="checkStroke" class="primary">✅ 批改</button>
+        <button id="showStroke">👀 顯示答案</button>
+        <button id="resetStroke">♻️ 重設</button>
         <button id="shuffleStroke" class="primary">🔀 重排例字</button>
+        <span id="statusStroke" class="pill">尚未批改。</span>
       </div>
-      <div class="tag gray" style="margin-bottom:0.3rem;">提示：先横畫，後貫穿 → 先寫上部或前部橫畫，再寫貫穿的豎畫。</div>
-      <div id="strokeA" class="stroke-grid" style="margin-bottom:0.7rem;"></div>
-      <div class="tag gray" style="margin-bottom:0.3rem;">提示：底部橫畫最後寫 → 底橫收筆壓軸，先寫其餘部件。</div>
-      <div id="strokeB" class="stroke-grid"></div>
+      <div id="strokeList" class="list"></div>
     </div>
   </div>
 
@@ -401,7 +434,6 @@
       "我跟爸爸媽媽說：「我長大了，自己會做許多事，不用你們幫忙了！」"
     ];
 
-    // token 列表；p=true 為標點；fillSet 用於基礎版需填空
     const fillSet = new Set(["會","温習","早上","許多","刷牙","幫忙","中午","晚上","功課","每天","擠","牙膏","牙齒","筷子","碗裏","米飯","一遍"]);
     const tokens = [
       {t:"早上", p:false},{t:"，", p:true},{t:"我", p:false},{t:"會", p:false},
@@ -427,14 +459,13 @@
       {t:"，", p:true},{t:"不用", p:false},{t:"你們", p:false},{t:"幫忙", p:false},
       {t:"了", p:false},{t:"！」", p:true}
     ];
-    // paragraph slicing index ranges
     const paraSlices = [
-      [0,15],   // 0-14
-      [15,31],  // 15-30
-      [31,49],  // 31-48
-      [49,71]   // 49-70
+      [0,15],
+      [15,31],
+      [31,49],
+      [49,71]
     ];
-    const advTokens = tokens.map(x=>({...x})); // 進階版全部填
+    const advTokens = tokens.map(x=>({...x}));
 
     /* ========= DOM ========= */
     const textBox = document.getElementById("textBox");
@@ -461,15 +492,18 @@
     const vocabRead = document.getElementById("vocabRead");
     const shuffleVocab = document.getElementById("shuffleVocab");
 
-    const strokeA = document.getElementById("strokeA");
-    const strokeB = document.getElementById("strokeB");
+    const strokeList = document.getElementById("strokeList");
+    const checkStroke = document.getElementById("checkStroke");
+    const showStroke = document.getElementById("showStroke");
+    const resetStroke = document.getElementById("resetStroke");
     const shuffleStroke = document.getElementById("shuffleStroke");
+    const statusStroke = document.getElementById("statusStroke");
 
     /* ========= 工具 ========= */
     const normalize = s => (s||"").trim();
     function checkList(listEl, statusEl){
       let allOk = true;
-      listEl.querySelectorAll("input").forEach(input=>{
+      listEl.querySelectorAll("input[type='text']").forEach(input=>{
         const ans = input.dataset.answer || "";
         const ok = normalize(input.value) === normalize(ans);
         input.style.borderColor = ok ? "#16a34a" : "#dc2626";
@@ -484,7 +518,7 @@
       });
     }
     function resetList(listEl, statusEl){
-      listEl.querySelectorAll("input").forEach(inp=>{
+      listEl.querySelectorAll("input[type='text']").forEach(inp=>{
         inp.value = "";
         inp.style.borderColor = "#cbd5e1";
         inp.style.background = "#fff";
@@ -502,14 +536,14 @@
     /* ========= 渲染：基礎版（段落式顯示） ========= */
     function renderBasic(){
       basicList.innerHTML = "";
-      paraSlices.forEach((range, pi)=>{
+      paraSlices.forEach(range=>{
         const [start, end] = range;
         const card = document.createElement("div");
         card.className = "para-card";
         const line = document.createElement("div");
         line.className = "para-line";
 
-        tokens.slice(start, end).forEach((item, idx)=>{
+        tokens.slice(start, end).forEach(item=>{
           const wrap = document.createElement("span");
           wrap.style.display = "inline-flex";
           wrap.style.alignItems = "center";
@@ -536,14 +570,13 @@
             const ans = document.createElement("div");
             ans.className = "answer";
             ans.textContent = "答案：" + item.t;
-            card.appendChild(ans); // answers gathered at end; duplicates ok (minimal)
+            card.appendChild(ans);
           } else {
             const chip = document.createElement("span");
             chip.className = "text-chip";
             chip.textContent = item.t;
             wrap.appendChild(chip);
           }
-
           line.appendChild(wrap);
         });
 
@@ -617,50 +650,100 @@
       });
     }
 
-    /* ========= 筆順例字 ========= */
-    const strokeAData = [
-      ["中","zhōng"],["事","shì"],["車","chē"],["甲","jiǎ"],["由","yóu"],["申","shēn"],
-      ["再","zài"],["卓","zhuó"],["干","gān"],["幸","xìng"],["革","gé"]
+    /* ========= 第五部份：配對筆順規則（40題） ========= */
+    const strokeData = [
+      // A：先横畫，後貫穿
+      ["中","zhōng","A"],["事","shì","A"],["車","chē","A"],["甲","jiǎ","A"],["由","yóu","A"],
+      ["申","shēn","A"],["再","zài","A"],["卓","zhuó","A"],["幸","xìng","A"],["革","gé","A"],
+      ["干","gān","A"],["幹","gàn","A"],["十","shí","A"],["王","wáng","A"],["玉","yù","A"],
+      ["古","gǔ","A"],["亞","yà","A"],["面","miàn","A"],["丰","fēng","A"],["東","dōng","A"],
+      // B：底部橫畫最後寫
+      ["生","shēng","B"],["睡","shuì","B"],["重","zhòng","B"],["垂","chuí","B"],["章","zhāng","B"],
+      ["童","tóng","B"],["至","zhì","B"],["度","dù","B"],["康","kāng","B"],["庭","tíng","B"],
+      ["庫","kù","B"],["室","shì","B"],["底","dǐ","B"],["店","diàn","B"],["座","zuò","B"],
+      ["唐","táng","B"],["廣","guǎng","B"],["椅","yǐ","B"],["義","yì","B"],["舞","wǔ","B"]
     ];
-    const strokeBData = [
-      ["生","shēng"],["睡","shuì"],["重","zhòng"],["垂","chuí"],["章","zhāng"],["童","tóng"],
-      ["至","zhì"],["庫","kù"],["室","shì"]
-    ];
-    function renderStroke(){
-      strokeA.innerHTML = "";
-      strokeB.innerHTML = "";
-      shuffle(strokeAData).forEach(([c,p])=>{
+    function renderStrokeMatch(){
+      strokeList.innerHTML = "";
+      shuffle(strokeData).forEach((item, idx)=>{
+        const [char, pin, rule] = item;
         const card = document.createElement("div");
-        card.className = "stroke-card";
-        const info = document.createElement("div");
-        info.className = "stroke-info";
-        info.innerHTML = `<div class="char">${c}</div><div class="pin">${p}</div>`;
-        const tag = document.createElement("div");
-        tag.className = "tag";
-        tag.textContent = "先横畫，後貫穿";
-        const btn = document.createElement("button");
-        btn.className = "play";
-        btn.textContent = "🔊";
-        btn.onclick = ()=> speak(c);
-        card.append(info, tag, btn);
-        strokeA.appendChild(card);
+        card.className = "match-card";
+        card.dataset.answer = rule;
+
+        const top = document.createElement("div");
+        top.className = "match-top";
+        const cbox = document.createElement("div");
+        cbox.className = "char-box";
+        cbox.textContent = char;
+        const pinEl = document.createElement("div");
+        pinEl.className = "pin";
+        pinEl.textContent = pin;
+        const playBtn = document.createElement("button");
+        playBtn.className = "play";
+        playBtn.textContent = "🔊";
+        playBtn.onclick = ()=> speak(char);
+        top.append(cbox, pinEl, playBtn);
+
+        const opts = document.createElement("div");
+        opts.className = "options";
+        const idA = `optA-${idx}`;
+        const idB = `optB-${idx}`;
+        const mkOpt = (val, text, id) => {
+          const label = document.createElement("label");
+          label.className = "opt";
+          label.setAttribute("for", id);
+          const inp = document.createElement("input");
+          inp.type = "radio";
+          inp.name = `rule-${idx}`;
+          inp.id = id;
+          inp.value = val;
+          label.append(inp, document.createTextNode(text));
+          return label;
+        };
+        opts.append(
+          mkOpt("A", "A 先横畫，後貫穿", idA),
+          mkOpt("B", "B 底部橫畫最後寫", idB)
+        );
+
+        const ans = document.createElement("div");
+        ans.className = "answer";
+        ans.textContent = "答案：" + (rule === "A" ? "A 先横畫，後貫穿" : "B 底部橫畫最後寫");
+
+        card.append(top, opts, ans);
+        strokeList.appendChild(card);
       });
-      shuffle(strokeBData).forEach(([c,p])=>{
-        const card = document.createElement("div");
-        card.className = "stroke-card";
-        const info = document.createElement("div");
-        info.className = "stroke-info";
-        info.innerHTML = `<div class="char">${c}</div><div class="pin">${p}</div>`;
-        const tag = document.createElement("div");
-        tag.className = "tag";
-        tag.textContent = "底部橫畫最後寫";
-        const btn = document.createElement("button");
-        btn.className = "play";
-        btn.textContent = "🔊";
-        btn.onclick = ()=> speak(c);
-        card.append(info, tag, btn);
-        strokeB.appendChild(card);
+    }
+    function checkStrokeMatch(){
+      let allOk = true;
+      strokeList.querySelectorAll(".match-card").forEach(card=>{
+        const ans = card.dataset.answer;
+        const sel = card.querySelector("input[type='radio']:checked")?.value;
+        const ok = sel === ans;
+        card.style.borderColor = ok ? "#16a34a" : "#dc2626";
+        card.style.background = ok ? "#ecfdf3" : "#fef2f2";
+        allOk = allOk && ok;
       });
+      statusStroke.textContent = allOk ? "全部正確！" : "已批改，尚有錯誤。";
+    }
+    function showStrokeAnswers(){
+      strokeList.querySelectorAll(".answer").forEach(a=> a.style.display="block");
+      strokeList.querySelectorAll(".match-card").forEach(card=>{
+        const ans = card.dataset.answer;
+        const radio = card.querySelector(`input[value='${ans}']`);
+        if (radio) radio.checked = true;
+      });
+    }
+    function resetStrokeMatch(){
+      strokeList.querySelectorAll(".match-card").forEach(card=>{
+        card.style.borderColor = "#e2e8f0";
+        card.style.background = "#fff";
+        card.querySelectorAll("input[type='radio']").forEach(r=> r.checked=false);
+        const ans = card.querySelector(".answer");
+        if (ans) ans.style.display="none";
+      });
+      statusStroke.textContent = "尚未批改。";
+      stopAll();
     }
 
     /* ========= 朗讀整篇 ========= */
@@ -692,7 +775,11 @@
     resetAdv.onclick = () => resetList(advList, statusAdv);
 
     shuffleVocab.onclick = renderVocab;
-    shuffleStroke.onclick = () => { renderStroke(); };
+
+    checkStroke.onclick = checkStrokeMatch;
+    showStroke.onclick = showStrokeAnswers;
+    resetStroke.onclick = resetStrokeMatch;
+    shuffleStroke.onclick = () => { renderStrokeMatch(); statusStroke.textContent = "尚未批改。"; };
 
     document.body.addEventListener("click", ()=>{}, { once:true });
     if ("speechSynthesis" in window){
@@ -707,7 +794,7 @@
     renderBasic();
     renderAdv();
     renderVocab();
-    renderStroke();
+    renderStrokeMatch();
     textBox.style.display = "block";
   </script>
 </body>
