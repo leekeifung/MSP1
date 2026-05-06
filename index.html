@@ -375,32 +375,44 @@
       </div>
     </div>
 
-    <!-- ─── 人文 ─── -->
-    <div class="card" data-subject="人文 Humanities">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="icon bg-human">🌏</div>
-        <div>
-          <h2>人文</h2>
-          <div class="sub">Humanities</div>
-        </div>
-        <span class="toggle">▾</span>
-      </div>
-      <div class="card-body">
-        <li data-keywords="">
-          <a href="humanities/relationship-v1.html">
-              <span class="link-icon">🖼️</span>
-              圖卡認讀 ·粵語 父系、母系人物關係
-              <span class="tag tag-new">最新</span>
-            </a>
-            <a href="humanities/relationship-v2.html">
-              <span class="link-icon">🖼️</span>
-              親戚稱謂配對練習（可拖拉＋朗讀）
-              <span class="tag tag-new">最新</span>
-            </a>
-          </li>
-        <p class="coming-soon">📦 即將推出 Coming soon…</p>
-      </div>
+   <!-- ─── 人文 ─── -->
+<div class="card" data-subject="人文 Humanities">
+  <div
+    class="card-header"
+    role="button"
+    tabindex="0"
+    onclick="toggleCard(this)"
+    onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleCard(this); }"
+  >
+    <div class="icon bg-human">🌏</div>
+    <div>
+      <h2>人文</h2>
+      <div class="sub">Humanities</div>
     </div>
+    <span class="toggle">▾</span>
+  </div>
+  <div class="card-body">
+    <ul class="lesson-list">
+      <li data-keywords="親戚稱謂">
+        <a href="humanities/relationship-v1.html">
+          <span class="link-icon">🖼️</span>
+          圖卡認讀 · 粵語 父系、母系親戚稱謂
+          <span class="tag tag-new">最新</span>
+        </a>
+      </li>
+      <li data-keywords="親戚稱謂">
+        <a href="humanities/relationship-v2.html">
+          <span class="link-icon">🖼️</span>
+          親戚稱謂配對練習（可拖拉＋朗讀）
+          <span class="tag tag-new">最新</span>
+        </a>
+      </li>
+      <li class="coming-soon" aria-disabled="true">
+        📦 即將推出 Coming soon…
+      </li>
+    </ul>
+  </div>
+</div>
 
     <!-- ─── 科學 ─── -->
     <div class="card" data-subject="科學 Science">
