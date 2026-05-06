@@ -1,1 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>人物關係圖：親戚稱謂配對（可拖拉＋朗讀）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .drop-ok { border-color: #10b981; background: #ecfdf3; }
+    .drop-bad { border-color: #ef4444; background: #fef2f2; }
+    .tile-dragging { opacity: 0.7; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <header class="space-y-3">
+      <h1 class="text-2xl font-bold">人物關係圖：親戚稱謂配對練習</h1>
+      <p class="text-sm text-slate-600">拖拉或點選配對；每個稱謂與人物都可朗讀。若未出聲，請先點擊頁面啟用語音。</p>
+      <div class="flex flex-wrap items-center gap-4 text-sm">
+        <span class="font-semibold text-slate-700">配對語言：</span>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="lang" value="cantonese" class="accent-emerald-600" checked> 廣州話口語
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="lang" value="mandarin" class="accent-emerald-600"> 普通話口語
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="lang" value="written" class="accent-emerald-600"> 書面語
+        </label>
+      </div>
+    </header>
 
+    <div id="sections" class="space-y-6"></div>
+  </div>
+
+  <script>
+    // 資料：人物節點與各語言稱謂
+    const sectionsData = [
+      {
+        id: "maternal",
+        title: "母系親戚關係圖",
+        groups: [
+          { label: "外祖父母", nodes: ["m-gpa","m-gma"] },
+          { label: "媽媽", nodes: ["mom"] },
+          { label: "媽媽的兄弟姊妹", nodes: ["m-uncle","m-aunt-elder","m-aunt-younger"] },
+          { label: "配偶", nodes: ["m-uncle-wife","m-aunt-husband"] },
+        ],
+        nodes: {
+          "m-gpa": { person: "媽媽的爸爸", answers: { cantonese: "公公", mandarin: "姥爺", written: "外祖父" }, fixed: false },
+          "m-gma": { person: "媽媽的媽媽", answers: { cantonese: "婆婆", mandarin: "姥姥", written: "外祖母" }, fixed: false },
+          "mom":   { person: "媽媽", fixed: true },
+          "m-uncle": { person: "媽媽的兄弟", answers: { cantonese: "舅父", mandarin: "舅舅", written: "舅父" }, fixed: false },
+          "m-aunt-elder": { person: "媽媽的姐姐", answers: { cantonese: "嫂媽", mandarin: "嬸媽", written: "嬸母" }, fixed: false },
+          "m-aunt-younger": { person: "媽媽的妹妹", answers: { cantonese: "阿姨", mandarin: "嬸媽", written: "嬸母" }, fixed: false },
+          "m-uncle-wife": { person: "舅父的妻子", answers: { cantonese: "舅母", mandarin: "舅媽", written: "舅母" }, fixed: false },
+          "m-aunt-husband": { person: "姨母的丈夫", answers: { cantonese: "姨丈", mandarin: "姨爸", written: "姨丈" }, fixed: false },
+        }
+      },
+      {
+        id: "paternal",
+        title: "父系親戚關係圖",
+        groups: [
+          { label: "祖父母", nodes: ["p-gpa","p-gma"] },
+          { label: "爸爸", nodes: ["dad"] },
+          { label: "爸爸的兄弟姊妹", nodes: ["p-uncle-older","p-uncle-younger","p-aunt-elder","p-aunt-younger"] },
+          { label: "配偶", nodes: ["p-uncle-older-wife","p-aunt-husband"] },
+        ],
+        nodes: {
+          "p-gpa": { person: "爸爸的爸爸", answers: { cantonese: "爺爺", mandarin: "爺爺", written: "祖父" }, fixed: false },
+          "p-gma": { person: "爸爸的媽媽", answers: { cantonese: "嫲嫲", mandarin: "奶奶", written: "祖母" }, fixed: false },
+          "dad":   { person: "爸爸", fixed: true },
+          "p-uncle-older": { person: "爸爸的哥哥", answers: { cantonese: "伯父", mandarin: "伯伯", written: "伯父" }, fixed: false },
+          "p-uncle-younger": { person: "爸爸的弟弟", answers: { cantonese: "阿叔", mandarin: "叔叔", written: "叔父" }, fixed: false },
+          "p-aunt-elder": { person: "爸爸的姐姐", answers: { cantonese: "姑媽", mandarin: "姑媽", written: "姑母" }, fixed: false },
+          "p-aunt-younger": { person: "爸爸的妹妹", answers: { cantonese: "姑姐", mandarin: "姑姑", written: "姑母" }, fixed: false },
+          "p-uncle-older-wife": { person: "伯父的妻子", answers: { cantonese: "伯娘", mandarin: "伯母", written: "伯母" }, fixed: false },
+          "p-aunt-husband": { person: "姑母的丈夫", answers: { cantonese: "姑丈", mandarin: "姑爸", written: "姑丈" }, fixed: false },
+        }
+      }
+    ];
+
+    const preferredVoices = ["yue-HK","yue-Hant-HK","zh-HK","zh-TW","zh-CN"];
+    function pickVoice() {
+      const vs = speechSynthesis.getVoices();
+      return vs.find(v => preferredVoices.includes(v.lang))
+          || vs.find(v => v.lang && v.lang.startsWith("yue"))
+          || vs.find(v => v.lang && v.lang.startsWith("zh"))
+          || null;
+    }
+    function speak(text) {
+      if (!("speechSynthesis" in window) || !text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      const v = pickVoice();
+      if (v) u.voice = v;
+      u.lang = v ? v.lang : "zh-HK";
+      u.rate = 1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    if (window.speechSynthesis) {
+      speechSynthesis.getVoices();
+      if (typeof speechSynthesis.onvoiceschanged !== "undefined") {
+        speechSynthesis.onvoiceschanged = () => {};
+      }
+    }
+
+    const state = {
+      lang: "cantonese",
+      sections: {}
+    };
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildTiles(section, lang) {
+      const tiles = [];
+      Object.entries(section.nodes).forEach(([id, node]) => {
+        if (node.fixed) return;
+        tiles.push({
+          id: `${section.id}-${id}`,
+          target: `${section.id}-${id}`,
+          text: node.answers[lang],
+        });
+      });
+      return shuffle(tiles);
+    }
+
+    function createNodeEl(sectionId, nodeId, node) {
+      const zoneId = `${sectionId}-${nodeId}`;
+      const fixed = node.fixed;
+      const wrapper = document.createElement("div");
+      wrapper.className = "bg-white rounded border border-slate-200 p-3 flex flex-col gap-2 shadow-sm";
+      wrapper.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-sm font-semibold text-slate-800">${node.person}</span>
+          <button class="text-emerald-700 hover:text-emerald-900" data-say="${node.person}" title="朗讀人物">🔊</button>
+        </div>
+        <div class="${fixed ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "border border-dashed border-slate-300 text-slate-500"} drop-zone h-16 rounded flex items-center justify-center text-sm"
+             data-zone="${zoneId}">
+             ${fixed ? "（固定）" : "拖拉或點此放置"}
+        </div>
+      `;
+      return wrapper;
+    }
+
+    function renderSection(section) {
+      const root = document.createElement("section");
+      root.className = "bg-white rounded-lg shadow border border-slate-200 p-4 space-y-4";
+      root.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-semibold">${section.title}</h2>
+            <p class="text-xs text-slate-600">拖拉或點選配對；點 🔊 可朗讀。</p>
+          </div>
+          <div class="flex flex-wrap gap-2 text-sm">
+            <button data-act="shuffle" data-section="${section.id}" class="px-3 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-700">🔀 重排</button>
+            <button data-act="check" data-section="${section.id}" class="px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700">✅ 批改</button>
+            <button data-act="show" data-section="${section.id}" class="px-3 py-1.5 rounded bg-amber-500 text-white hover:bg-amber-600">👀 顯示答案</button>
+            <button data-act="reset" data-section="${section.id}" class="px-3 py-1.5 rounded bg-slate-200 text-slate-800 hover:bg-slate-300">♻️ 重設</button>
+          </div>
+        </div>
+        <p id="${section.id}-status" class="text-sm text-slate-600">尚未作答。</p>
+        <div class="space-y-3" id="${section.id}-tree"></div>
+        <div>
+          <h3 class="text-sm font-semibold mb-1">待配對的稱謂（拖到節點或點選後再點節點）：</h3>
+          <div id="${section.id}-bank" class="min-h-14 flex flex-wrap gap-2 bg-slate-100 border border-slate-200 rounded p-2"></div>
+        </div>
+      `;
+      document.getElementById("sections").appendChild(root);
+
+      state.sections[section.id] = {
+        tiles: buildTiles(section, state.lang),
+        selectedTileId: null,
+      };
+
+      renderTree(section);
+      renderBank(section);
+    }
+
+    function renderTree(section) {
+      const tree = document.getElementById(`${section.id}-tree`);
+      tree.innerHTML = "";
+      section.groups.forEach(group => {
+        const row = document.createElement("div");
+        row.className = "space-y-2";
+        row.innerHTML = `<div class="text-sm font-semibold text-slate-700">${group.label}</div>`;
+        const grid = document.createElement("div");
+        grid.className = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3";
+        group.nodes.forEach(nid => {
+          const node = section.nodes[nid];
+          grid.appendChild(createNodeEl(section.id, nid, node));
+        });
+        row.appendChild(grid);
+        tree.appendChild(row);
+      });
+    }
+
+    function createTileEl(tile) {
+      const el = document.createElement("div");
+      el.className = "tile cursor-move select-none px-3 py-1.5 rounded border border-slate-300 bg-white shadow-sm flex items-center gap-2 text-sm";
+      el.draggable = true;
+      el.dataset.tileId = tile.id;
+      el.dataset.target = tile.target;
+      el.innerHTML = `
+        <span class="flex-1">${tile.text}</span>
+        <button type="button" class="text-emerald-700 hover:text-emerald-900" data-say="${tile.text}" title="朗讀稱謂">🔊</button>
+      `;
+      return el;
+    }
+
+    function renderBank(section) {
+      const bank = document.getElementById(`${section.id}-bank`);
+      bank.innerHTML = "";
+      const tiles = state.sections[section.id].tiles;
+      tiles.forEach(t => {
+        if (!document.querySelector(`[data-zone="${t.target}"] .tile`)) {
+          bank.appendChild(createTileEl(t));
+        }
+      });
+    }
+
+    function clearMarks(sectionId) {
+      document.querySelectorAll(`#${sectionId}-tree .drop-zone`).forEach(z => {
+        z.classList.remove("drop-ok","drop-bad");
+      });
+    }
+
+    function placeTile(tileEl, targetZone) {
+      if (!tileEl || !targetZone) return;
+      // 若區內已有磚，移回 bank
+      const existing = targetZone.querySelector(".tile");
+      if (existing) {
+        const bank = document.getElementById(targetZone.dataset.zone.split("-")[0] + "-bank");
+        bank.appendChild(existing);
+      }
+      targetZone.innerHTML = "";
+      targetZone.appendChild(tileEl);
+    }
+
+    function resetSection(section) {
+      const sid = section.id;
+      state.sections[sid].tiles = buildTiles(section, state.lang);
+      state.sections[sid].selectedTileId = null;
+      // 清空所有區
+      document.querySelectorAll(`#${sid}-tree .drop-zone`).forEach(z => {
+        if (!section.nodes[z.dataset.zone.split("-").slice(1).join("-")].fixed) {
+          z.innerHTML = "拖拉或點此放置";
+        }
+        z.classList.remove("drop-ok","drop-bad");
+      });
+      renderBank(section);
+      document.getElementById(`${sid}-status`).textContent = "已重設，尚未作答。";
+    }
+
+    function showAnswers(section) {
+      const sid = section.id;
+      Object.entries(section.nodes).forEach(([nid, node]) => {
+        if (node.fixed) return;
+        const zone = document.querySelector(`[data-zone="${sid}-${nid}"]`);
+        const tileEl = document.querySelector(`.tile[data-tile-id="${sid}-${nid}"]`);
+        if (zone && tileEl) {
+          placeTile(tileEl, zone);
+        }
+      });
+      clearMarks(sid);
+      document.getElementById(`${sid}-status`).textContent = "已顯示答案。";
+    }
+
+    function checkSection(section) {
+      const sid = section.id;
+      let total = 0, correct = 0;
+      document.querySelectorAll(`#${sid}-tree .drop-zone`).forEach(z => {
+        const nid = z.dataset.zone.split("-").slice(1).join("-");
+        if (section.nodes[nid].fixed) return;
+        total++;
+        const tile = z.querySelector(".tile");
+        if (tile && tile.dataset.target === z.dataset.zone) {
+          correct++; z.classList.add("drop-ok"); z.classList.remove("drop-bad");
+        } else {
+          z.classList.add("drop-bad"); z.classList.remove("drop-ok");
+        }
+      });
+      document.getElementById(`${sid}-status`).textContent = `已批改：${correct} / ${total}。`;
+    }
+
+    // 建立版面
+    sectionsData.forEach(renderSection);
+
+    // 語言切換
+    document.querySelectorAll('input[name="lang"]').forEach(r => {
+      r.addEventListener("change", (e) => {
+        state.lang = e.target.value;
+        sectionsData.forEach(sec => {
+          resetSection(sec);
+          document.getElementById(`${sec.id}-status`).textContent = "已切換語言並重設，尚未作答。";
+        });
+      });
+    });
+
+    // 事件：點擊（朗讀、選取、放置、控制鍵）
+    document.addEventListener("click", (e) => {
+      const sayBtn = e.target.closest("[data-say]");
+      if (sayBtn) {
+        speak(sayBtn.dataset.say);
+        return;
+      }
+
+      const tile = e.target.closest(".tile");
+      if (tile) {
+        const sid = tile.dataset.target.split("-")[0];
+        const st = state.sections[sid];
+        if (st.selectedTileId === tile.dataset.tileId) {
+          st.selectedTileId = null;
+          tile.classList.remove("ring-2","ring-amber-400");
+        } else {
+          document.querySelectorAll(".tile").forEach(t => t.classList.remove("ring-2","ring-amber-400"));
+          st.selectedTileId = tile.dataset.tileId;
+          tile.classList.add("ring-2","ring-amber-400");
+        }
+        return;
+      }
+
+      const zone = e.target.closest(".drop-zone");
+      if (zone) {
+        const sid = zone.dataset.zone.split("-")[0];
+        const st = state.sections[sid];
+        if (st.selectedTileId) {
+          const tileEl = document.querySelector(`.tile[data-tile-id="${st.selectedTileId}"]`);
+          placeTile(tileEl, zone);
+          st.selectedTileId = null;
+          document.querySelectorAll(".tile").forEach(t => t.classList.remove("ring-2","ring-amber-400"));
+          clearMarks(sid);
+        }
+        return;
+      }
+
+      const actBtn = e.target.closest("[data-act]");
+      if (actBtn) {
+        const sid = actBtn.dataset.section;
+        const section = sectionsData.find(s => s.id === sid);
+        const act = actBtn.dataset.act;
+        if (act === "shuffle") {
+          state.sections[sid].tiles = shuffle(state.sections[sid].tiles);
+          // 全部移回 bank
+          const bank = document.getElementById(`${sid}-bank`);
+          document.querySelectorAll(`.tile[data-tile-id^="${sid}-"]`).forEach(t => bank.appendChild(t));
+          renderBank(section);
+          clearMarks(sid);
+          document.getElementById(`${sid}-status`).textContent = "已重排，尚未作答。";
+        } else if (act === "reset") {
+          resetSection(section);
+        } else if (act === "show") {
+          showAnswers(section);
+        } else if (act === "check") {
+          checkSection(section);
+        }
+        return;
+      }
+    });
+
+    // 拖放事件
+    document.addEventListener("dragstart", (e) => {
+      const tile = e.target.closest(".tile");
+      if (!tile) return;
+      tile.classList.add("tile-dragging");
+      e.dataTransfer.setData("text/plain", tile.dataset.tileId);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    document.addEventListener("dragend", (e) => {
+      const tile = e.target.closest(".tile");
+      if (tile) tile.classList.remove("tile-dragging");
+    });
+    document.addEventListener("dragover", (e) => {
+      if (e.target.closest(".drop-zone") || e.target.closest("[id$='-bank']")) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener("drop", (e) => {
+      const zone = e.target.closest(".drop-zone");
+      const bank = e.target.closest("[id$='-bank']");
+      const tileId = e.dataTransfer.getData("text/plain");
+      if (!tileId) return;
+      const tileEl = document.querySelector(`.tile[data-tile-id="${tileId}"]`);
+      if (!tileEl) return;
+
+      if (zone) {
+        e.preventDefault();
+        const sid = zone.dataset.zone.split("-")[0];
+        placeTile(tileEl, zone);
+        clearMarks(sid);
+      } else if (bank) {
+        e.preventDefault();
+        bank.appendChild(tileEl);
+        const sid = bank.id.replace("-bank","");
+        clearMarks(sid);
+      }
+    });
+  </script>
+</body>
+</html>
