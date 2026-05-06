@@ -22,7 +22,7 @@
   </div>
 
   <script>
-    // 資料：以圖片中的表格為準（包含地方用法，可能與標準稱謂略有差異）
+    // 資料
     const sectionData = [
       {
         id: "maternal",
@@ -64,7 +64,7 @@
     ];
 
     // 語音朗讀
-    const preferredVoices = ["yue-HK", "yue-Hant-HK", "zh-HK", "zh-TW", "zh-CN"];
+    const preferredVoices = ["yue-HK","yue-Hant-HK","zh-HK","zh-TW","zh-CN"];
     function pickVoice() {
       const vs = speechSynthesis.getVoices();
       return vs.find(v => preferredVoices.includes(v.lang))
@@ -82,7 +82,6 @@
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     }
-    // 預載語音
     if (window.speechSynthesis) {
       speechSynthesis.getVoices();
       if (typeof speechSynthesis.onvoiceschanged !== "undefined") {
@@ -90,7 +89,7 @@
       }
     }
 
-    // 狀態管理
+    // 狀態
     const sectionStates = {};
 
     function shuffle(array) {
@@ -141,8 +140,7 @@
                 <div class="p-2 border-r border-slate-200">人物</div>
                 ${section.columns.map(c => `<div class="p-2 border-r last:border-r-0 border-slate-200">${c.label}</div>`).join("")}
               </div>
-              <div id="${section.id}-table" class="divide-y divide-slate-200 border border-slate-200 border-t-0">
-              </div>
+              <div id="${section.id}-table" class="divide-y divide-slate-200 border border-slate-200 border-t-0"></div>
             </div>
           </div>
           <div>
@@ -153,7 +151,7 @@
       `;
       document.getElementById("sections").appendChild(root);
 
-      // 狀態
+      // 初始狀態
       sectionStates[section.id] = {
         tiles: shuffle(buildTiles(section)),
         selectedTileId: null,
@@ -163,14 +161,14 @@
       renderBank(section);
     }
 
-    function createTileEl(tile, sectionId) {
+    function createTileEl(tile) {
       const el = document.createElement("div");
       el.className = "tile cursor-move select-none px-3 py-1.5 rounded border border-slate-300 bg-white shadow-sm flex items-center gap-2 text-sm";
       el.draggable = true;
       el.dataset.tileId = tile.id;
       el.dataset.target = tile.target;
       el.innerHTML = `<span class="flex-1">${tile.text}</span>
-                      <button type="button" class="text-emerald-700 hover:text-emerald-900" data-say="${tile.text}">🔊</button>`;
+                      <button type="button" class="text-emerald-700 hover:text-emerald-900" data-say="${tile.text}" title="朗讀稱謂">🔊</button>`;
       return el;
     }
 
@@ -178,9 +176,8 @@
       const bank = document.getElementById(`${section.id}-bank`);
       bank.innerHTML = "";
       sectionStates[section.id].tiles.forEach(t => {
-        // Only those not already in table
         if (!document.querySelector(`[data-zone="${t.target}"] .tile`)) {
-          bank.appendChild(createTileEl(t, section.id));
+          bank.appendChild(createTileEl(t));
         }
       });
     }
@@ -191,14 +188,12 @@
       section.rows.forEach((row, ri) => {
         const rowEl = document.createElement("div");
         rowEl.className = "grid grid-cols-4 text-sm";
-        // 人物欄
         const personCell = document.createElement("div");
         personCell.className = "p-2 border-r border-slate-200 flex items-center gap-2 bg-white";
         personCell.innerHTML = `<span>${row.person}</span>
-                                <button class="text-emerald-700 hover:text-emerald-900" data-say="${row.person}">🔊</button>`;
+                                <button class="text-emerald-700 hover:text-emerald-900" data-say="${row.person}" title="朗讀人物">🔊</button>`;
         rowEl.appendChild(personCell);
 
-        // 其他欄位 drop zone
         section.columns.forEach(col => {
           const dz = document.createElement("div");
           dz.className = "p-2 border-r last:border-r-0 border-slate-200 bg-white";
@@ -212,20 +207,14 @@
       });
     }
 
-    function getTileById(sectionId, tileId) {
-      return sectionStates[sectionId].tiles.find(t => t.id === tileId);
-    }
-
     function clearMarks(sectionId) {
       document.querySelectorAll(`#${sectionId}-table .drop-zone`).forEach(z => {
         z.classList.remove("drop-ok","drop-bad");
       });
     }
 
-    // 放置邏輯
     function placeTile(tileEl, targetZone) {
       if (!tileEl || !targetZone) return;
-      // 若區內已有磚，移回對應 bank
       const existing = targetZone.querySelector(".tile");
       if (existing) {
         const bank = document.getElementById(targetZone.dataset.zone.split("-")[0] + "-bank");
@@ -235,24 +224,19 @@
       targetZone.appendChild(tileEl);
     }
 
-    // 事件委派
+    // 事件委派：朗讀 / 選取 / 放置 / 控制鈕
     document.addEventListener("click", (e) => {
       const sayBtn = e.target.closest("[data-say]");
-      if (sayBtn) {
-        speak(sayBtn.dataset.say);
-        return;
-      }
+      if (sayBtn) { speak(sayBtn.dataset.say); return; }
 
       const tile = e.target.closest(".tile");
       if (tile) {
         const sectionId = tile.dataset.target.split("-")[0];
         const state = sectionStates[sectionId];
-        // 切換選取
         if (state.selectedTileId === tile.dataset.tileId) {
           state.selectedTileId = null;
           tile.classList.remove("ring-2","ring-amber-400");
         } else {
-          // 取消其他高亮
           document.querySelectorAll(".tile").forEach(t => t.classList.remove("ring-2","ring-amber-400"));
           state.selectedTileId = tile.dataset.tileId;
           tile.classList.add("ring-2","ring-amber-400");
@@ -278,48 +262,47 @@
       if (actBtn) {
         const sectionId = actBtn.dataset.section;
         const act = actBtn.dataset.act;
+        const section = sectionData.find(s => s.id === sectionId);
+
         if (act === "shuffle") {
           sectionStates[sectionId].tiles = shuffle(sectionStates[sectionId].tiles);
-          // 移回所有到 bank
           const bank = document.getElementById(`${sectionId}-bank`);
-          const allTiles = document.querySelectorAll(`.tile[data-tile-id^="${sectionId}-"]`);
-          allTiles.forEach(t => bank.appendChild(t));
-          renderBank(sectionData.find(s => s.id === sectionId));
+          document.querySelectorAll(`.tile[data-tile-id^="${sectionId}-"]`).forEach(t => bank.appendChild(t));
+          renderBank(section);
           clearMarks(sectionId);
           document.getElementById(`${sectionId}-status`).textContent = "已重排，尚未作答。";
         } else if (act === "reset") {
-          sectionStates[sectionId].tiles = shuffle(sectionStates[sectionId].tiles);
+          sectionStates[sectionId].tiles = shuffle(buildTiles(section));
           const bank = document.getElementById(`${sectionId}-bank`);
-          const allTiles = document.querySelectorAll(`.tile[data-tile-id^="${sectionId}-"]`);
-          allTiles.forEach(t => bank.appendChild(t));
-          renderBank(sectionData.find(s => s.id === sectionId));
+          document.querySelectorAll(`.tile[data-tile-id^="${sectionId}-"]`).forEach(t => bank.appendChild(t));
+          renderBank(section);
           document.querySelectorAll(`#${sectionId}-table .drop-zone`).forEach(z => {
             z.innerHTML = "拖拉或點此放置";
           });
           clearMarks(sectionId);
           document.getElementById(`${sectionId}-status`).textContent = "已重設，尚未作答。";
         } else if (act === "show") {
-          const section = sectionData.find(s => s.id === sectionId);
-          const bank = document.getElementById(`${sectionId}-bank`);
           section.rows.forEach((row, ri) => {
             section.columns.forEach(col => {
               const zone = document.querySelector(`[data-zone="${sectionId}-r${ri}-${col.key}"]`);
-              // 找到正確磚
               const tileEl = document.querySelector(`.tile[data-tile-id="${sectionId}-r${ri}-${col.key}"]`);
-              if (tileEl) {
-                placeTile(tileEl, zone);
-              }
+              if (zone && tileEl) placeTile(tileEl, zone);
             });
           });
           clearMarks(sectionId);
           document.getElementById(`${sectionId}-status`).textContent = "已顯示答案。";
         } else if (act === "check") {
-          const section = sectionData.find(s => s.id === sectionId);
+          // 修正：改以「文字比對」而非「tile ID 比對」，避免同詞重複時判錯
           let total = 0, correct = 0;
           document.querySelectorAll(`#${sectionId}-table .drop-zone`).forEach(z => {
-            total++;
+            const parts = z.dataset.zone.split("-");
+            const ri = parseInt(parts[1].slice(1), 10);
+            const colKey = parts.slice(2).join("-"); // e.g., "cantonese"
+            const expected = section.rows[ri].answers[colKey];
             const tile = z.querySelector(".tile");
-            if (tile && tile.dataset.target === z.dataset.zone) {
+            const tileText = tile ? tile.querySelector("span").textContent.trim() : "";
+            total++;
+            if (tile && tileText === expected) {
               correct++; z.classList.add("drop-ok"); z.classList.remove("drop-bad");
             } else {
               z.classList.add("drop-bad"); z.classList.remove("drop-ok");
@@ -331,7 +314,7 @@
       }
     });
 
-    // 拖放事件
+    // 拖放
     document.addEventListener("dragstart", (e) => {
       const tile = e.target.closest(".tile");
       if (!tile) return;
