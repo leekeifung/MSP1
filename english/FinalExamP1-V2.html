@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1 English — Dictation & Matching (Method School)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1100px; margin: 0 auto; padding: 16px; padding-top: 120px; background: #f7fafc; color: #2d3748; }
+  h1 { color: #2c5282; margin-bottom: 4px; }
+  h2 { color: #2b6cb0; border-bottom: 3px solid #bee3f8; padding-bottom: 6px; margin-top: 32px; }
+  h3 { color: #4a5568; margin: 0 0 8px 0; }
+  .subtitle { color: #718096; margin-top: 0; }
+  .panel { background: white; border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  
+  /* FIXED Voice Panel at top */
+  .voice-panel-wrapper {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: #ebf8ff; border-bottom: 3px solid #4299e1;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+  .voice-panel-inner { max-width: 1100px; margin: 0 auto; padding: 8px 16px; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 3px 0; }
+  .speed-btn { padding: 5px 11px; margin: 1px; border-radius: 6px; border: 1.5px solid #cbd5e0; background: white; cursor: pointer; font-weight: 600; font-size: 13px; }
+  .speed-btn.active { background: #4299e1; color: white; border-color: #2b6cb0; }
+  .speed-btn:hover { background: #ebf8ff; }
+  .speed-btn.active:hover { background: #2b6cb0; }
+  
+  .item { display: flex; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 1px dashed #e2e8f0; flex-wrap: wrap; }
+  .item:last-child { border-bottom: none; }
+  .num { color: #718096; min-width: 28px; font-weight: 600; }
+  .play-btn { background: #4299e1; color: white; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+  .play-btn:hover { background: #2b6cb0; }
+  .illustration { font-size: 22px; min-width: 70px; max-width: 240px; text-align: center; line-height: 1.2; word-break: break-all; }
+  .colour-box { display: inline-block; width: 50px; height: 30px; border-radius: 6px; border: 2px solid #4a5568; }
+  .num-display { font-size: 32px; font-weight: bold; color: #2c5282; }
+  
+  input.answer { padding: 8px 10px; border: 1.5px solid #cbd5e0; border-radius: 6px; flex: 1; min-width: 140px; font-size: 16px; }
+  input.answer:focus { outline: none; border-color: #4299e1; }
+  .check-btn { background: #48bb78; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .check-btn:hover { background: #2f855a; }
+  .show-btn { background: #ed8936; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .show-btn:hover { background: #c05621; }
+  .feedback { font-weight: bold; min-width: 28px; font-size: 20px; }
+  .feedback.correct { color: #2f855a; }
+  .feedback.wrong { color: #c53030; }
+  .answer-text { color: #805ad5; font-style: italic; font-weight: 600; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .secondary-btn { background: #805ad5; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .secondary-btn:hover { background: #553c9a; }
+  .danger-btn { background: #e53e3e; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .danger-btn:hover { background: #9b2c2c; }
+  
+  .picture-frame { background: linear-gradient(180deg, #fff7ed 0%, #fef3c7 100%); border: 4px solid #d97706; border-radius: 14px; padding: 10px; margin: 12px auto; max-width: 720px; box-shadow: inset 0 0 12px rgba(0,0,0,0.06); }
+  .picture-frame svg { width: 100%; height: auto; display: block; }
+  
+  select.voice-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e0; max-width: 220px; font-size: 13px; }
+  .pitch-display { font-weight: bold; color: #2b6cb0; min-width: 30px; }
+  .info { background: #fffaf0; border-left: 4px solid #ed8936; padding: 8px 12px; margin: 8px 0; border-radius: 4px; font-size: 14px; }
+  
+  @media (max-width: 700px) {
+    body { padding-top: 160px; }
+    .illustration { min-width: 50px; font-size: 18px; }
+    input.answer { min-width: 100px; }
+    .speed-btn { padding: 4px 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =========== FIXED VOICE PANEL =========== -->
+<div class="voice-panel-wrapper">
+  <div class="voice-panel-inner">
+    <div class="row">
+      <strong style="color:#2c5282;">🔊 Voice</strong>
+      <span style="color:#4a5568;">Speed:</span>
+      <button class="speed-btn" data-speed="0.2">0.2x</button>
+      <button class="speed-btn" data-speed="0.3">0.3x</button>
+      <button class="speed-btn" data-speed="0.5">0.5x</button>
+      <button class="speed-btn" data-speed="0.7">0.7x</button>
+      <button class="speed-btn active" data-speed="1">1x</button>
+    </div>
+    <div class="row">
+      <span style="color:#4a5568;">Pitch:</span>
+      <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1" style="width:130px;">
+      <span class="pitch-display" id="pitchVal">1.0</span>
+      <span style="color:#4a5568;">| Voice:</span>
+      <select id="voiceSelect" class="voice-select"></select>
+    </div>
+  </div>
+</div>
+
+<h1>🍎 P1 English — Dictation &amp; Matching</h1>
+<p class="subtitle">Method School • Listen 🎧 • Type ✏️ • Check ✅</p>
+<div class="info">💡 <strong>Refresh the page</strong> or click <strong>🎲 New Random</strong> in Part 1(a) for different fruit-number combinations every time!</div>
+
+<!-- PART 1(a) FRUITS (RANDOM) -->
+<h2>Part 1(a) — Fruits with Numbers 🍇🍅 <span style="font-size:14px;color:#805ad5;">(random each refresh)</span></h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('fruits')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('fruits')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="regenerateFruits()">🎲 New Random</button>
+    <button class="danger-btn" onclick="resetSection('fruits')">🔄 Reset</button>
+  </div>
+  <div id="fruits"></div>
+</div>
+
+<!-- PART 1(b) -->
+<h2>Part 1(b) — Actions 🏃</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('actions')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('actions')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('actions')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('actions')">🔄 Reset</button>
+  </div>
+  <div id="actions"></div>
+</div>
+
+<!-- PART 1(c) -->
+<h2>Part 1(c) — Farm Animals 🐝🐔🐄</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('animals')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('animals')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('animals')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('animals')">🔄 Reset</button>
+  </div>
+  <div id="animals"></div>
+</div>
+
+<!-- PART 1(d) NUMBERS -->
+<h2>Part 1(d) — Numbers 11–20 🔢</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('numbers')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('numbers')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('numbers')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('numbers')">🔄 Reset</button>
+  </div>
+  <div id="numbers"></div>
+</div>
+
+<!-- PART 1(d) COLOURS -->
+<h2>Part 1(d) — Colours 🎨</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('colours')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('colours')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('colours')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('colours')">🔄 Reset</button>
+  </div>
+  <div id="colours"></div>
+</div>
+
+<!-- PART 2 -->
+<h2>Part 2 — Yes / No Questions (this / that / these / those)</h2>
+<div class="panel">
+  <p>Listen 🎧 and look at the picture 🖼️. Type the correct short answer.</p>
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('yesno')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('yesno')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('yesno')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('yesno')">🔄 Reset</button>
+  </div>
+  <div id="yesno"></div>
+</div>
+
+<!-- PART 3 -->
+<h2>Part 3 — Wh- Questions (Look at the picture)</h2>
+<div class="panel">
+  <h3>🖼️ Look at the picture carefully:</h3>
+  <div class="picture-frame">
+    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+      <!-- Panel frames -->
+      <rect x="3" y="3" width="394" height="294" fill="none" stroke="#7c2d12" stroke-width="4" rx="6"/>
+      <rect x="403" y="3" width="394" height="294" fill="none" stroke="#7c2d12" stroke-width="4" rx="6"/>
+      <rect x="3" y="303" width="394" height="294" fill="none" stroke="#7c2d12" stroke-width="4" rx="6"/>
+      <rect x="403" y="303" width="394" height="294" fill="none" stroke="#7c2d12" stroke-width="4" rx="6"/>
+
+      <!-- ====== PANEL 1: BEDROOM (Paul reading) ====== -->
+      <g>
+        <rect x="5" y="5" width="390" height="180" fill="#fef3c7"/>
+        <rect x="5" y="185" width="390" height="110" fill="#d4a373"/>
+        <!-- Window -->
+        <rect x="280" y="30" width="80" height="80" fill="#bae6fd" stroke="#1e3a8a" stroke-width="2"/>
+        <line x1="320" y1="30" x2="320" y2="110" stroke="#1e3a8a" stroke-width="2"/>
+        <line x1="280" y1="70" x2="360" y2="70" stroke="#1e3a8a" stroke-width="2"/>
+        <circle cx="320" cy="70" r="14" fill="#fcd34d"/>
+        <!-- Picture on wall -->
+        <rect x="40" y="35" width="60" height="45" fill="#fff" stroke="#7c2d12" stroke-width="2"/>
+        <circle cx="55" cy="55" r="6" fill="#fbbf24"/>
+        <path d="M65 75 L75 60 L85 75 Z" fill="#16a34a"/>
+        <!-- Bed -->
+        <rect x="30" y="180" width="230" height="80" fill="#a78bfa" stroke="#4c1d95" stroke-width="2"/>
+        <rect x="30" y="155" width="80" height="40" fill="#fff" stroke="#4c1d95" stroke-width="2"/>
+        <rect x="30" y="225" width="230" height="35" fill="#c4b5fd" stroke="#4c1d95" stroke-width="2"/>
+        <!-- Paul sitting on bed -->
+        <!-- Body -->
+        <path d="M140 175 L132 220 L195 220 L187 175 Z" fill="#3b82f6"/>
+        <!-- Arms holding book -->
+        <path d="M132 180 Q115 200 120 220" stroke="#3b82f6" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <path d="M195 180 Q212 200 207 220" stroke="#3b82f6" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Hands -->
+        <circle cx="120" cy="220" r="7" fill="#fde68a"/>
+        <circle cx="207" cy="220" r="7" fill="#fde68a"/>
+        <!-- Head -->
+        <circle cx="163" cy="155" r="22" fill="#fde68a" stroke="#000" stroke-width="1.5"/>
+        <!-- Hair -->
+        <path d="M141 153 Q163 125 185 153 L183 142 Q163 130 143 142 Z" fill="#3e2723"/>
+        <!-- Eyes -->
+        <circle cx="155" cy="155" r="2" fill="#000"/>
+        <circle cx="171" cy="155" r="2" fill="#000"/>
+        <!-- Smile -->
+        <path d="M153 165 Q163 172 173 165" stroke="#000" stroke-width="1.5" fill="none"/>
+        <!-- Book in hands -->
+        <rect x="110" y="215" width="105" height="45" fill="#fff" stroke="#000" stroke-width="2" rx="2"/>
+        <line x1="162" y1="215" x2="162" y2="260" stroke="#000" stroke-width="1.5"/>
+        <g stroke="#64748b" stroke-width="1">
+          <line x1="120" y1="225" x2="155" y2="225"/>
+          <line x1="120" y1="233" x2="155" y2="233"/>
+          <line x1="120" y1="241" x2="155" y2="241"/>
+          <line x1="120" y1="249" x2="155" y2="249"/>
+          <line x1="170" y1="225" x2="205" y2="225"/>
+          <line x1="170" y1="233" x2="205" y2="233"/>
+          <line x1="170" y1="241" x2="205" y2="241"/>
+          <line x1="170" y1="249" x2="205" y2="249"/>
+        </g>
+        <!-- Name label -->
+        <rect x="285" y="220" width="100" height="60" fill="#fff" stroke="#3b82f6" stroke-width="3" rx="6"/>
+        <text x="335" y="245" text-anchor="middle" font-size="22" font-weight="bold" fill="#3b82f6">Paul</text>
+        <text x="335" y="265" text-anchor="middle" font-size="13" fill="#666">🛏️ bedroom</text>
+      </g>
+
+      <!-- ====== PANEL 2: KITCHEN (Mary drinking milk) ====== -->
+      <g>
+        <rect x="405" y="5" width="390" height="180" fill="#fef9c3"/>
+        <rect x="405" y="185" width="390" height="110" fill="#a3a3a3"/>
+        <!-- Fridge -->
+        <rect x="420" y="40" width="70" height="155" fill="#e2e8f0" stroke="#374151" stroke-width="2"/>
+        <line x1="420" y1="105" x2="490" y2="105" stroke="#374151" stroke-width="2"/>
+        <circle cx="480" cy="72" r="3" fill="#374151"/>
+        <circle cx="480" cy="140" r="3" fill="#374151"/>
+        <!-- Cabinet on wall -->
+        <rect x="500" y="30" width="100" height="60" fill="#d4a373" stroke="#7c2d12" stroke-width="2"/>
+        <line x1="550" y1="30" x2="550" y2="90" stroke="#7c2d12" stroke-width="2"/>
+        <!-- Counter -->
+        <rect x="500" y="190" width="290" height="50" fill="#92400e"/>
+        <rect x="500" y="185" width="290" height="10" fill="#d4a373"/>
+        <!-- Stove -->
+        <rect x="680" y="170" width="80" height="20" fill="#1f2937"/>
+        <circle cx="700" cy="180" r="5" fill="#374151"/>
+        <circle cx="740" cy="180" r="5" fill="#374151"/>
+        <!-- Plate on counter -->
+        <ellipse cx="560" cy="200" rx="20" ry="5" fill="#f3f4f6" stroke="#374151" stroke-width="1.5"/>
+        
+        <!-- Mary -->
+        <!-- Body -->
+        <path d="M608 165 L600 225 L660 225 L652 165 Z" fill="#ec4899"/>
+        <!-- Arms -->
+        <path d="M600 170 Q585 195 585 220" stroke="#ec4899" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <path d="M660 170 Q673 195 668 215" stroke="#ec4899" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Hands -->
+        <circle cx="585" cy="220" r="7" fill="#fde68a"/>
+        <circle cx="668" cy="215" r="7" fill="#fde68a"/>
+        <!-- Glass of milk near right hand -->
+        <path d="M660 180 L663 215 L685 215 L688 180 Z" fill="#fff" stroke="#000" stroke-width="2"/>
+        <ellipse cx="674" cy="182" rx="13" ry="3" fill="#f3f4f6" stroke="#000" stroke-width="1"/>
+        <!-- Head -->
+        <circle cx="630" cy="140" r="22" fill="#fde68a" stroke="#000" stroke-width="1.5"/>
+        <!-- Long hair -->
+        <path d="M608 138 Q630 108 652 138 L654 175 Q650 145 630 140 Q610 145 606 175 Z" fill="#7c2d12"/>
+        <!-- Eyes -->
+        <circle cx="622" cy="140" r="2" fill="#000"/>
+        <circle cx="638" cy="140" r="2" fill="#000"/>
+        <!-- Smile -->
+        <path d="M620 150 Q630 157 640 150" stroke="#000" stroke-width="1.5" fill="none"/>
+        <!-- Legs -->
+        <rect x="612" y="225" width="14" height="50" fill="#1e40af"/>
+        <rect x="632" y="225" width="14" height="50" fill="#1e40af"/>
+        <ellipse cx="619" cy="280" rx="10" ry="5" fill="#000"/>
+        <ellipse cx="639" cy="280" rx="10" ry="5" fill="#000"/>
+        
+        <!-- Name label -->
+        <rect x="697" y="225" width="95" height="60" fill="#fff" stroke="#ec4899" stroke-width="3" rx="6"/>
+        <text x="744" y="250" text-anchor="middle" font-size="22" font-weight="bold" fill="#ec4899">Mary</text>
+        <text x="744" y="270" text-anchor="middle" font-size="13" fill="#666">🍳 kitchen</text>
+      </g>
+
+      <!-- ====== PANEL 3: CLASSROOM (Lucy drawing) ====== -->
+      <g>
+        <rect x="5" y="305" width="390" height="175" fill="#e0f2fe"/>
+        <rect x="5" y="480" width="390" height="115" fill="#cbd5e0"/>
+        <!-- Blackboard -->
+        <rect x="30" y="325" width="175" height="105" fill="#14532d" stroke="#000" stroke-width="3"/>
+        <text x="118" y="360" text-anchor="middle" font-size="20" fill="#fff" font-family="serif">A B C</text>
+        <text x="118" y="395" text-anchor="middle" font-size="20" fill="#fff" font-family="serif">1 2 3</text>
+        <text x="118" y="420" text-anchor="middle" font-size="14" fill="#fef3c7">★ ★ ★</text>
+        <!-- Clock on wall -->
+        <circle cx="340" cy="355" r="22" fill="#fff" stroke="#000" stroke-width="2"/>
+        <line x1="340" y1="355" x2="340" y2="340" stroke="#000" stroke-width="2"/>
+        <line x1="340" y1="355" x2="352" y2="355" stroke="#000" stroke-width="2"/>
+        <circle cx="340" cy="355" r="2" fill="#000"/>
+        <!-- Desk -->
+        <rect x="220" y="460" width="160" height="20" fill="#d4a373" stroke="#7c2d12" stroke-width="2"/>
+        <rect x="230" y="480" width="10" height="60" fill="#7c2d12"/>
+        <rect x="360" y="480" width="10" height="60" fill="#7c2d12"/>
+        <!-- Paper on desk -->
+        <rect x="245" y="448" width="105" height="14" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <!-- Flower being drawn -->
+        <g>
+          <circle cx="288" cy="455" r="2.5" fill="#fb7185"/>
+          <circle cx="284" cy="453" r="2" fill="#fb7185"/>
+          <circle cx="292" cy="453" r="2" fill="#fb7185"/>
+          <circle cx="288" cy="451" r="2" fill="#fb7185"/>
+          <circle cx="288" cy="457" r="2" fill="#fb7185"/>
+          <circle cx="288" cy="455" r="1.5" fill="#fbbf24"/>
+        </g>
+        <!-- Crayons box -->
+        <rect x="260" y="432" width="30" height="14" fill="#7c2d12"/>
+        <line x1="263" y1="432" x2="263" y2="446" stroke="#dc2626" stroke-width="2.5"/>
+        <line x1="268" y1="432" x2="268" y2="446" stroke="#2563eb" stroke-width="2.5"/>
+        <line x1="273" y1="432" x2="273" y2="446" stroke="#eab308" stroke-width="2.5"/>
+        <line x1="278" y1="432" x2="278" y2="446" stroke="#16a34a" stroke-width="2.5"/>
+        <line x1="283" y1="432" x2="283" y2="446" stroke="#ec4899" stroke-width="2.5"/>
+        <line x1="288" y1="432" x2="288" y2="446" stroke="#7c3aed" stroke-width="2.5"/>
+        
+        <!-- Lucy at desk -->
+        <!-- Body -->
+        <path d="M283 412 L275 460 L325 460 L317 412 Z" fill="#dc2626"/>
+        <!-- Right arm drawing -->
+        <path d="M317 418 Q335 440 332 458" stroke="#dc2626" stroke-width="13" stroke-linecap="round" fill="none"/>
+        <!-- Left arm -->
+        <path d="M283 418 Q272 440 277 460" stroke="#dc2626" stroke-width="13" stroke-linecap="round" fill="none"/>
+        <!-- Hands -->
+        <circle cx="332" cy="458" r="7" fill="#fde68a"/>
+        <circle cx="277" cy="460" r="7" fill="#fde68a"/>
+        <!-- Crayon in right hand -->
+        <line x1="328" y1="458" x2="312" y2="458" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <!-- Head -->
+        <circle cx="300" cy="392" r="20" fill="#fde68a" stroke="#000" stroke-width="1.5"/>
+        <!-- Hair top -->
+        <path d="M281 388 Q300 365 319 388 L317 395 Q300 372 283 395 Z" fill="#1f2937"/>
+        <!-- Pigtails -->
+        <circle cx="277" cy="400" r="7" fill="#1f2937"/>
+        <circle cx="323" cy="400" r="7" fill="#1f2937"/>
+        <circle cx="277" cy="400" r="3" fill="#fbbf24"/>
+        <circle cx="323" cy="400" r="3" fill="#fbbf24"/>
+        <line x1="277" y1="406" x2="275" y2="418" stroke="#1f2937" stroke-width="3"/>
+        <line x1="323" y1="406" x2="325" y2="418" stroke="#1f2937" stroke-width="3"/>
+        <!-- Eyes -->
+        <circle cx="293" cy="392" r="2" fill="#000"/>
+        <circle cx="307" cy="392" r="2" fill="#000"/>
+        <!-- Smile -->
+        <path d="M292 402 Q300 408 308 402" stroke="#000" stroke-width="1.5" fill="none"/>
+        
+        <!-- Name label -->
+        <rect x="40" y="505" width="100" height="60" fill="#fff" stroke="#dc2626" stroke-width="3" rx="6"/>
+        <text x="90" y="530" text-anchor="middle" font-size="22" font-weight="bold" fill="#dc2626">Lucy</text>
+        <text x="90" y="550" text-anchor="middle" font-size="13" fill="#666">📚 classroom</text>
+      </g>
+
+      <!-- ====== PANEL 4: GARDEN (Joe singing) ====== -->
+      <g>
+        <rect x="405" y="305" width="390" height="175" fill="#7dd3fc"/>
+        <rect x="405" y="480" width="390" height="115" fill="#86efac"/>
+        <!-- Sun -->
+        <circle cx="730" cy="350" r="25" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+        <g stroke="#f59e0b" stroke-width="3" stroke-linecap="round">
+          <line x1="730" y1="315" x2="730" y2="323"/>
+          <line x1="730" y1="377" x2="730" y2="385"/>
+          <line x1="695" y1="350" x2="703" y2="350"/>
+          <line x1="757" y1="350" x2="765" y2="350"/>
+          <line x1="707" y1="327" x2="713" y2="333"/>
+          <line x1="747" y1="367" x2="753" y2="373"/>
+          <line x1="707" y1="373" x2="713" y2="367"/>
+          <line x1="747" y1="333" x2="753" y2="327"/>
+        </g>
+        <!-- Clouds -->
+        <ellipse cx="505" cy="345" rx="32" ry="14" fill="#fff"/>
+        <ellipse cx="525" cy="340" rx="20" ry="11" fill="#fff"/>
+        <!-- Tree -->
+        <rect x="425" y="415" width="22" height="80" fill="#7c2d12"/>
+        <circle cx="436" cy="405" r="32" fill="#16a34a" stroke="#14532d" stroke-width="2"/>
+        <circle cx="418" cy="395" r="20" fill="#16a34a"/>
+        <circle cx="455" cy="395" r="20" fill="#16a34a"/>
+        <circle cx="425" cy="400" r="4" fill="#dc2626"/>
+        <circle cx="450" cy="410" r="4" fill="#dc2626"/>
+        <circle cx="436" cy="420" r="4" fill="#dc2626"/>
+        <!-- Flowers in grass -->
+        <g>
+          <line x1="485" y1="510" x2="485" y2="528" stroke="#16a34a" stroke-width="2"/>
+          <circle cx="485" cy="505" r="6" fill="#ec4899"/>
+          <circle cx="485" cy="505" r="2" fill="#fbbf24"/>
+        </g>
+        <g>
+          <line x1="510" y1="540" x2="510" y2="555" stroke="#16a34a" stroke-width="2"/>
+          <circle cx="510" cy="535" r="6" fill="#fff"/>
+          <circle cx="510" cy="535" r="2" fill="#fbbf24"/>
+        </g>
+        <g>
+          <line x1="720" y1="555" x2="720" y2="570" stroke="#16a34a" stroke-width="2"/>
+          <circle cx="720" cy="550" r="6" fill="#fbbf24"/>
+          <circle cx="720" cy="550" r="2" fill="#fb923c"/>
+        </g>
+        
+        <!-- Joe singing -->
+        <!-- Body -->
+        <path d="M593 425 L585 490 L640 490 L632 425 Z" fill="#22c55e"/>
+        <!-- Left arm down -->
+        <path d="M585 432 Q572 460 575 485" stroke="#22c55e" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Right arm up holding mic -->
+        <path d="M640 430 Q655 420 652 410" stroke="#22c55e" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <!-- Hands -->
+        <circle cx="575" cy="485" r="7" fill="#fde68a"/>
+        <circle cx="650" cy="410" r="7" fill="#fde68a"/>
+        <!-- Microphone -->
+        <rect x="647" y="392" width="6" height="22" fill="#1f2937" rx="2"/>
+        <ellipse cx="650" cy="392" rx="11" ry="9" fill="#374151"/>
+        <ellipse cx="650" cy="392" rx="7" ry="5" fill="#6b7280"/>
+        <!-- Head -->
+        <circle cx="612" cy="405" r="22" fill="#fde68a" stroke="#000" stroke-width="1.5"/>
+        <!-- Hair (spiky) -->
+        <path d="M590 400 L593 385 L598 395 L603 380 L608 395 L613 378 L618 395 L623 380 L628 395 L633 385 L634 400 Z" fill="#451a03"/>
+        <!-- Eyes -->
+        <circle cx="604" cy="403" r="2" fill="#000"/>
+        <circle cx="620" cy="403" r="2" fill="#000"/>
+        <!-- Singing mouth -->
+        <ellipse cx="612" cy="416" rx="5" ry="7" fill="#7f1d1d"/>
+        <!-- Legs -->
+        <rect x="597" y="490" width="13" height="55" fill="#1e3a8a"/>
+        <rect x="615" y="490" width="13" height="55" fill="#1e3a8a"/>
+        <ellipse cx="604" cy="548" rx="9" ry="5" fill="#000"/>
+        <ellipse cx="621" cy="548" rx="9" ry="5" fill="#000"/>
+        <!-- Music notes -->
+        <text x="665" y="385" font-size="30" fill="#dc2626" font-weight="bold">♪</text>
+        <text x="685" y="425" font-size="34" fill="#2563eb" font-weight="bold">♫</text>
+        <text x="555" y="415" font-size="28" fill="#7c3aed" font-weight="bold">♬</text>
+        <text x="565" y="375" font-size="25" fill="#dc2626" font-weight="bold">♪</text>
+        
+        <!-- Name label -->
+        <rect x="685" y="500" width="100" height="60" fill="#fff" stroke="#22c55e" stroke-width="3" rx="6"/>
+        <text x="735" y="525" text-anchor="middle" font-size="22" font-weight="bold" fill="#22c55e">Joe</text>
+        <text x="735" y="545" text-anchor="middle" font-size="13" fill="#666">🌳 garden</text>
+      </g>
+    </svg>
+  </div>
+  <p style="color:#4a5568; margin:12px 0 0 0;">🎧 Now listen to each question and write your answer.</p>
+  <div class="controls" style="margin-top:14px;">
+    <button class="check-btn" onclick="checkAll('wh')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('wh')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('wh')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('wh')">🔄 Reset</button>
+  </div>
+  <div id="wh"></div>
+</div>
+
+<p style="text-align:center;color:#a0aec0;margin:24px 0;">— End of Worksheet — 努力!💪</p>
+
+<script>
+/* =========================================================
+   PART 1(a) — RANDOMIZED FRUITS + NUMBERS
+========================================================= */
+const FRUITS = [
+  { singular:'tomato',     plural:'tomatoes',     emoji:'🍅' },
+  { singular:'watermelon', plural:'watermelons',  emoji:'🍉' },
+  { singular:'blueberry',  plural:'blueberries',  emoji:'🫐' },
+  { singular:'peach',      plural:'peaches',      emoji:'🍑' },
+  { singular:'grape',      plural:'grapes',       emoji:'🍇' },
+  { singular:'strawberry', plural:'strawberries', emoji:'🍓' },
+  { singular:'banana',     plural:'bananas',      emoji:'🍌' },
+  { singular:'mango',      plural:'mangoes',      emoji:'🥭' },
+];
+const NUMBER_WORDS = ['','one','two','three','four','five','six','seven','eight','nine'];
+
+function generateRandomFruits() {
+  return shuffle([...FRUITS]).map(f => {
+    const count = Math.floor(Math.random() * 9) + 1; // 1-9
+    const numWord = NUMBER_WORDS[count];
+    const name = count === 1 ? f.singular : f.plural;
+    return {
+      word: `${numWord} ${name}`,
+      emoji: f.emoji.repeat(count)
+    };
+  });
+}
+
+/* =========================================================
+   DATA
+========================================================= */
+const DATA = {
+  fruits: generateRandomFruits(),
+  actions: [
+    { word:'watching', emoji:'👀📺' },
+    { word:'drinking', emoji:'🥤' },
+    { word:'eating',   emoji:'🍽️' },
+    { word:'drawing',  emoji:'✏️🖼️' },
+    { word:'reading',  emoji:'📖' },
+    { word:'sleeping', emoji:'😴' },
+    { word:'talking',  emoji:'💬' },
+    { word:'singing',  emoji:'🎤' },
+  ],
+  animals: [
+    { word:'a bee',            emoji:'🐝' },
+    { word:'some bees',        emoji:'🐝🐝🐝' },
+    { word:'a duck',           emoji:'🦆' },
+    { word:'some ducks',       emoji:'🦆🦆🦆' },
+    { word:'a hen',            emoji:'🐔' },
+    { word:'some hens',        emoji:'🐔🐔🐔' },
+    { word:'a cat',            emoji:'🐈' },
+    { word:'some cats',        emoji:'🐈🐈🐈' },
+    { word:'a butterfly',      emoji:'🦋' },
+    { word:'some butterflies', emoji:'🦋🦋🦋' },
+    { word:'a dog',            emoji:'🐕' },
+    { word:'some dogs',        emoji:'🐕🐕🐕' },
+    { word:'a cow',            emoji:'🐄' },
+    { word:'some cows',        emoji:'🐄🐄🐄' },
+    { word:'a sheep',          emoji:'🐑' },
+    { word:'some sheep',       emoji:'🐑🐑🐑' },
+  ],
+  numbers: [
+    { word:'eleven',    emoji:'<span class="num-display">11</span>' },
+    { word:'twelve',    emoji:'<span class="num-display">12</span>' },
+    { word:'thirteen',  emoji:'<span class="num-display">13</span>' },
+    { word:'fourteen',  emoji:'<span class="num-display">14</span>' },
+    { word:'fifteen',   emoji:'<span class="num-display">15</span>' },
+    { word:'sixteen',   emoji:'<span class="num-display">16</span>' },
+    { word:'seventeen', emoji:'<span class="num-display">17</span>' },
+    { word:'eighteen',  emoji:'<span class="num-display">18</span>' },
+    { word:'nineteen',  emoji:'<span class="num-display">19</span>' },
+    { word:'twenty',    emoji:'<span class="num-display">20</span>' },
+  ],
+  colours: [
+    { word:'blue',   emoji:'<span class="colour-box" style="background:#3182ce;"></span>' },
+    { word:'red',    emoji:'<span class="colour-box" style="background:#e53e3e;"></span>' },
+    { word:'purple', emoji:'<span class="colour-box" style="background:#805ad5;"></span>' },
+    { word:'green',  emoji:'<span class="colour-box" style="background:#38a169;"></span>' },
+    { word:'orange', emoji:'<span class="colour-box" style="background:#dd6b20;"></span>' },
+    { word:'white',  emoji:'<span class="colour-box" style="background:#ffffff;"></span>' },
+    { word:'yellow', emoji:'<span class="colour-box" style="background:#ecc94b;"></span>' },
+    { word:'pink',   emoji:'<span class="colour-box" style="background:#f687b3;"></span>' },
+  ],
+  yesno: [
+    { speak:'Is this a banana?',      emoji:'🍌',     accept:["Yes, it is."] },
+    { speak:'Is that a cat?',         emoji:'🐈',     accept:["Yes, it is."] },
+    { speak:'Are these bees?',        emoji:'🐝🐝🐝', accept:["Yes, they are."] },
+    { speak:'Are those sheep?',       emoji:'🐑🐑🐑', accept:["Yes, they are."] },
+    { speak:'Is this a dog?',         emoji:'🐈',     accept:["No, it isn't.","No, it is not."] },
+    { speak:'Is that a tomato?',      emoji:'🍓',     accept:["No, it isn't.","No, it is not."] },
+    { speak:'Are these butterflies?', emoji:'🐝🐝🐝', accept:["No, they aren't.","No, they are not."] },
+    { speak:'Are those mangoes?',     emoji:'🍑🍑🍑', accept:["No, they aren't.","No, they are not."] },
+    { speak:'Is this a strawberry?',  emoji:'🍓',     accept:["Yes, it is."] },
+    { speak:'Are those cows?',        emoji:'🐄🐄🐄', accept:["Yes, they are."] },
+    { speak:'Are these ducks?',       emoji:'🐔🐔🐔', accept:["No, they aren't.","No, they are not."] },
+    { speak:'Is that a peach?',       emoji:'🍇',     accept:["No, it isn't.","No, it is not."] },
+  ],
+  wh: [
+    { speak:'What is Paul doing?',          emoji:'👦', accept:["He is reading a book.","He's reading a book.","Reading a book","Paul is reading a book."] },
+    { speak:'Who is drinking milk?',        emoji:'🥛', accept:["Mary is.","Mary","Mary is drinking milk."] },
+    { speak:'What is Mary drinking?',       emoji:'👧', accept:["She is drinking milk.","She's drinking milk.","Milk","Some milk"] },
+    { speak:'Where is Joe?',                emoji:'🧒', accept:["He is in the garden.","He's in the garden.","In the garden"] },
+    { speak:'What is Lucy drawing?',        emoji:'👶', accept:["She is drawing a flower.","She's drawing a flower.","A flower"] },
+    { speak:'Who is singing?',              emoji:'🎤', accept:["Joe is.","Joe","Joe is singing."] },
+    { speak:'Where is Paul?',               emoji:'👦', accept:["He is in the bedroom.","He's in the bedroom.","In the bedroom"] },
+    { speak:'How many children are there?', emoji:'👦👧🧒👶', accept:["Four.","4","Four","There are four.","There are 4."] },
+    { speak:'Who is reading a book?',       emoji:'📖', accept:["Paul is.","Paul","Paul is reading a book."] },
+    { speak:'Where is Lucy?',               emoji:'👶', accept:["She is in the classroom.","She's in the classroom.","In the classroom"] },
+  ],
+};
+
+/* =========================================================
+   SPEECH SYNTHESIS
+========================================================= */
+let currentSpeed = 1, currentPitch = 1, currentVoice = null, voices = [];
+
+function loadVoices() {
+  let all = speechSynthesis.getVoices();
+  voices = all.filter(v => v.lang.toLowerCase().startsWith('en'));
+  if (voices.length === 0) voices = all;
+  const sel = document.getElementById('voiceSelect');
+  sel.innerHTML = '';
+  voices.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${v.name} (${v.lang})`;
+    sel.appendChild(opt);
+  });
+  const preferred = voices.findIndex(v =>
+    /female|samantha|karen|tessa|moira|fiona|google us|zira|google uk english female/i.test(v.name));
+  if (preferred >= 0) { sel.value = preferred; currentVoice = voices[preferred]; }
+  else if (voices.length > 0) currentVoice = voices[0];
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+document.getElementById('voiceSelect').addEventListener('change', e => {
+  currentVoice = voices[e.target.value];
+});
+document.querySelectorAll('.speed-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpeed = parseFloat(btn.dataset.speed);
+  });
+});
+const pitchInput = document.getElementById('pitch');
+const pitchVal = document.getElementById('pitchVal');
+pitchInput.addEventListener('input', () => {
+  currentPitch = parseFloat(pitchInput.value);
+  pitchVal.textContent = currentPitch.toFixed(1);
+});
+function speak(text) {
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = currentSpeed;
+  utt.pitch = currentPitch;
+  if (currentVoice) utt.voice = currentVoice;
+  speechSynthesis.speak(utt);
+}
+
+/* =========================================================
+   RENDERING & UTILITIES
+========================================================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderSection(key) {
+  const container = document.getElementById(key);
+  container.innerHTML = '';
+  const items = shuffle(DATA[key]);
+  items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = (idx + 1) + '.';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'play-btn';
+    playBtn.textContent = '▶';
+    const speakText = it.speak || it.word;
+    playBtn.title = 'Listen';
+    playBtn.addEventListener('click', () => speak(speakText));
+
+    const ill = document.createElement('span');
+    ill.className = 'illustration';
+    ill.innerHTML = it.emoji;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer';
+    input.placeholder = 'Type what you hear...';
+    input.dataset.accept = JSON.stringify(it.accept || [it.word]);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') checkOne(input); });
+
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'check-btn';
+    checkBtn.textContent = 'Check';
+    checkBtn.addEventListener('click', () => checkOne(input));
+
+    const showBtn = document.createElement('button');
+    showBtn.className = 'show-btn';
+    showBtn.textContent = 'Show';
+    showBtn.addEventListener('click', () => showOne(input));
+
+    const fb = document.createElement('span');
+    fb.className = 'feedback';
+
+    row.append(num, playBtn, ill, input, checkBtn, showBtn, fb);
+    container.appendChild(row);
+  });
+}
+
+function regenerateFruits() {
+  DATA.fruits = generateRandomFruits();
+  renderSection('fruits');
+}
+
+function normalize(s) {
+  return s.toLowerCase().trim().replace(/[.,!?;:'"]/g,'').replace(/\s+/g,' ');
+}
+function checkOne(input) {
+  const accept = JSON.parse(input.dataset.accept);
+  const userAns = normalize(input.value);
+  const fb = input.parentElement.querySelector('.feedback');
+  if (userAns === '') { fb.textContent = '✏️'; fb.className = 'feedback'; return; }
+  const ok = accept.some(a => normalize(a) === userAns);
+  fb.textContent = ok ? '✓' : '✗';
+  fb.className = 'feedback ' + (ok ? 'correct' : 'wrong');
+}
+function showOne(input) {
+  const accept = JSON.parse(input.dataset.accept);
+  const fb = input.parentElement.querySelector('.feedback');
+  fb.innerHTML = '<span class="answer-text">' + accept[0] + '</span>';
+  fb.className = 'feedback';
+}
+function checkAll(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => checkOne(inp));
+}
+function showAll(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => showOne(inp));
+}
+function resetSection(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => {
+    inp.value = '';
+    const fb = inp.parentElement.querySelector('.feedback');
+    fb.textContent = ''; fb.className = 'feedback';
+  });
+}
+
+/* Dynamic body padding for fixed voice panel */
+function adjustBodyPadding() {
+  const panel = document.querySelector('.voice-panel-wrapper');
+  if (panel) document.body.style.paddingTop = (panel.offsetHeight + 16) + 'px';
+}
+window.addEventListener('load', adjustBodyPadding);
+window.addEventListener('resize', adjustBodyPadding);
+
+/* Initialize */
+['fruits','actions','animals','numbers','colours','yesno','wh'].forEach(renderSection);
+adjustBodyPadding();
+</script>
+</body>
+</html>
