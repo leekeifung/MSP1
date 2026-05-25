@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P1 English — Dictation & Matching (Method School)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1100px; margin: 0 auto; padding: 16px; background: #f7fafc; color: #2d3748; }
+  h1 { color: #2c5282; margin-bottom: 4px; }
+  h2 { color: #2b6cb0; border-bottom: 3px solid #bee3f8; padding-bottom: 6px; margin-top: 32px; }
+  h3 { color: #4a5568; margin: 0 0 8px 0; }
+  .subtitle { color: #718096; margin-top: 0; }
+  .panel { background: white; border-radius: 12px; padding: 16px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .voice-panel { background: #ebf8ff; border: 2px solid #90cdf4; position: sticky; top: 8px; z-index: 100; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0; }
+  .speed-btn { padding: 6px 14px; margin: 2px; border-radius: 8px; border: 1.5px solid #cbd5e0; background: white; cursor: pointer; font-weight: 600; }
+  .speed-btn.active { background: #4299e1; color: white; border-color: #2b6cb0; }
+  .speed-btn:hover { background: #ebf8ff; }
+  .speed-btn.active:hover { background: #2b6cb0; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 1px dashed #e2e8f0; flex-wrap: wrap; }
+  .item:last-child { border-bottom: none; }
+  .num { color: #718096; min-width: 28px; font-weight: 600; }
+  .play-btn { background: #4299e1; color: white; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+  .play-btn:hover { background: #2b6cb0; }
+  .illustration { font-size: 28px; min-width: 90px; max-width: 180px; text-align: center; line-height: 1.2; word-break: break-all; }
+  .colour-box { display: inline-block; width: 50px; height: 30px; border-radius: 6px; border: 2px solid #4a5568; }
+  .num-display { font-size: 32px; font-weight: bold; color: #2c5282; }
+  input.answer { padding: 8px 10px; border: 1.5px solid #cbd5e0; border-radius: 6px; flex: 1; min-width: 160px; font-size: 16px; }
+  input.answer:focus { outline: none; border-color: #4299e1; }
+  .check-btn { background: #48bb78; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .check-btn:hover { background: #2f855a; }
+  .show-btn { background: #ed8936; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .show-btn:hover { background: #c05621; }
+  .feedback { font-weight: bold; min-width: 28px; font-size: 20px; }
+  .feedback.correct { color: #2f855a; }
+  .feedback.wrong { color: #c53030; }
+  .answer-text { color: #805ad5; font-style: italic; font-weight: 600; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .secondary-btn { background: #805ad5; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .secondary-btn:hover { background: #553c9a; }
+  .danger-btn { background: #e53e3e; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .danger-btn:hover { background: #9b2c2c; }
+  .scene { background: linear-gradient(180deg, #fffaf0 0%, #feebc8 100%); padding: 20px; border-radius: 12px; border: 2px solid #f6ad55; }
+  .scene-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .person { background: white; padding: 14px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+  .person-emoji { font-size: 56px; line-height: 1; }
+  .person-name { font-weight: bold; color: #2c5282; font-size: 18px; margin: 6px 0 4px; }
+  .person-action { font-size: 32px; }
+  .person-desc { font-size: 13px; color: #4a5568; margin-top: 4px; }
+  select.voice-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e0; max-width: 280px; }
+  .pitch-display { font-weight: bold; color: #2b6cb0; min-width: 30px; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-weight: 600; color: #4a5568; padding: 4px 0; }
+  .info { background: #fffaf0; border-left: 4px solid #ed8936; padding: 8px 12px; margin: 8px 0; border-radius: 4px; font-size: 14px; }
+  @media (max-width: 600px) {
+    .scene-grid { grid-template-columns: 1fr; }
+    .item { gap: 6px; }
+    .illustration { min-width: 60px; font-size: 22px; }
+    input.answer { min-width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🍎 Primary 1 English — Dictation &amp; Matching</h1>
+<p class="subtitle">Method School • Listen 🎧, type what you hear ✏️, and check your answers individually ✅</p>
+
+<!-- VOICE SETTINGS -->
+<div class="panel voice-panel">
+  <h3>🔊 Voice Settings</h3>
+  <div class="row">
+    <strong>Speed:</strong>
+    <button class="speed-btn" data-speed="0.2">0.2x</button>
+    <button class="speed-btn" data-speed="0.3">0.3x</button>
+    <button class="speed-btn" data-speed="0.5">0.5x</button>
+    <button class="speed-btn" data-speed="0.7">0.7x</button>
+    <button class="speed-btn active" data-speed="1">1x</button>
+  </div>
+  <div class="row">
+    <strong>Pitch:</strong>
+    <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1" style="width:160px;">
+    <span class="pitch-display" id="pitchVal">1.0</span>
+  </div>
+  <div class="row">
+    <strong>Voice:</strong>
+    <select id="voiceSelect" class="voice-select"></select>
+  </div>
+  <div class="info">💡 Tip: Click anywhere on the page first if voices don't play. Use slower speeds (0.2x – 0.5x) for younger students to hear each sound clearly.</div>
+</div>
+
+<!-- PART 1(a) FRUITS -->
+<h2>Part 1(a) — Fruits & Numbers 🍇🍅🍌</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('fruits')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('fruits')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('fruits')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('fruits')">🔄 Reset</button>
+  </div>
+  <div id="fruits"></div>
+</div>
+
+<!-- PART 1(b) ACTIONS -->
+<h2>Part 1(b) — Actions 🏃</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('actions')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('actions')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('actions')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('actions')">🔄 Reset</button>
+  </div>
+  <div id="actions"></div>
+</div>
+
+<!-- PART 1(c) ANIMALS -->
+<h2>Part 1(c) — Farm Animals 🐝🐔🐄</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('animals')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('animals')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('animals')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('animals')">🔄 Reset</button>
+  </div>
+  <div id="animals"></div>
+</div>
+
+<!-- PART 1(d) NUMBERS -->
+<h2>Part 1(d) — Numbers 11–20 🔢</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('numbers')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('numbers')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('numbers')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('numbers')">🔄 Reset</button>
+  </div>
+  <div id="numbers"></div>
+</div>
+
+<!-- PART 1(d) COLOURS -->
+<h2>Part 1(d) — Colours 🎨</h2>
+<div class="panel">
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('colours')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('colours')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('colours')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('colours')">🔄 Reset</button>
+  </div>
+  <div id="colours"></div>
+</div>
+
+<!-- PART 2 YES/NO -->
+<h2>Part 2 — Yes / No Questions (this / that / these / those)</h2>
+<div class="panel">
+  <p>Listen 🎧 and look at the picture 🖼️. Type the correct short answer (e.g. <em>Yes, it is.</em> / <em>No, they aren't.</em>)</p>
+  <div class="controls">
+    <button class="check-btn" onclick="checkAll('yesno')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('yesno')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('yesno')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('yesno')">🔄 Reset</button>
+  </div>
+  <div id="yesno"></div>
+</div>
+
+<!-- PART 3 WH- QUESTIONS -->
+<h2>Part 3 — Wh- Questions (Look at the picture)</h2>
+<div class="panel">
+  <h3>🖼️ The Picture</h3>
+  <div class="scene">
+    <div class="scene-grid">
+      <div class="person">
+        <div class="person-emoji">👦</div>
+        <div class="person-name">Paul</div>
+        <div class="person-action">📖</div>
+        <div class="person-desc">Paul is reading a book in the bedroom.</div>
+      </div>
+      <div class="person">
+        <div class="person-emoji">👧</div>
+        <div class="person-name">Mary</div>
+        <div class="person-action">🥛</div>
+        <div class="person-desc">Mary is drinking milk in the kitchen.</div>
+      </div>
+      <div class="person">
+        <div class="person-emoji">🧒</div>
+        <div class="person-name">Joe</div>
+        <div class="person-action">🎤</div>
+        <div class="person-desc">Joe is singing in the garden.</div>
+      </div>
+      <div class="person">
+        <div class="person-emoji">👶</div>
+        <div class="person-name">Lucy</div>
+        <div class="person-action">🎨</div>
+        <div class="person-desc">Lucy is drawing a flower in the classroom.</div>
+      </div>
+    </div>
+  </div>
+  <div class="controls" style="margin-top:14px;">
+    <button class="check-btn" onclick="checkAll('wh')">✅ Check All</button>
+    <button class="show-btn" onclick="showAll('wh')">👁️ Show All Answers</button>
+    <button class="secondary-btn" onclick="renderSection('wh')">🔀 Shuffle</button>
+    <button class="danger-btn" onclick="resetSection('wh')">🔄 Reset</button>
+  </div>
+  <div id="wh"></div>
+</div>
+
+<p style="text-align:center;color:#a0aec0;margin:24px 0;">— End of Worksheet — 努力!💪</p>
+
+<script>
+/* =========================================================
+   DATA
+========================================================= */
+const DATA = {
+  fruits: [
+    { word: 'a tomato',          emoji: '🍅' },
+    { word: 'two tomatoes',      emoji: '🍅🍅' },
+    { word: 'a watermelon',      emoji: '🍉' },
+    { word: 'three watermelons', emoji: '🍉🍉🍉' },
+    { word: 'a blueberry',       emoji: '🫐' },
+    { word: 'six blueberries',   emoji: '🫐🫐🫐🫐🫐🫐' },
+    { word: 'a peach',           emoji: '🍑' },
+    { word: 'seven peaches',     emoji: '🍑🍑🍑🍑🍑🍑🍑' },
+    { word: 'a grape',           emoji: '🍇' },
+    { word: 'four grapes',       emoji: '🍇🍇🍇🍇' },
+    { word: 'a strawberry',      emoji: '🍓' },
+    { word: 'eight strawberries',emoji: '🍓🍓🍓🍓🍓🍓🍓🍓' },
+    { word: 'a banana',          emoji: '🍌' },
+    { word: 'five bananas',      emoji: '🍌🍌🍌🍌🍌' },
+    { word: 'a mango',           emoji: '🥭' },
+    { word: 'nine mangoes',      emoji: '🥭🥭🥭🥭🥭🥭🥭🥭🥭' },
+  ],
+  actions: [
+    { word: 'watching',  emoji: '👀📺' },
+    { word: 'drinking',  emoji: '🥤' },
+    { word: 'eating',    emoji: '🍽️' },
+    { word: 'drawing',   emoji: '✏️🖼️' },
+    { word: 'reading',   emoji: '📖' },
+    { word: 'sleeping',  emoji: '😴' },
+    { word: 'talking',   emoji: '💬' },
+    { word: 'singing',   emoji: '🎤' },
+  ],
+  animals: [
+    { word: 'a bee',           emoji: '🐝' },
+    { word: 'some bees',       emoji: '🐝🐝🐝' },
+    { word: 'a duck',          emoji: '🦆' },
+    { word: 'some ducks',      emoji: '🦆🦆🦆' },
+    { word: 'a hen',           emoji: '🐔' },
+    { word: 'some hens',       emoji: '🐔🐔🐔' },
+    { word: 'a cat',           emoji: '🐈' },
+    { word: 'some cats',       emoji: '🐈🐈🐈' },
+    { word: 'a butterfly',     emoji: '🦋' },
+    { word: 'some butterflies',emoji: '🦋🦋🦋' },
+    { word: 'a dog',           emoji: '🐕' },
+    { word: 'some dogs',       emoji: '🐕🐕🐕' },
+    { word: 'a cow',           emoji: '🐄' },
+    { word: 'some cows',       emoji: '🐄🐄🐄' },
+    { word: 'a sheep',         emoji: '🐑' },
+    { word: 'some sheep',      emoji: '🐑🐑🐑' },
+  ],
+  numbers: [
+    { word: 'eleven',    emoji: '<span class="num-display">11</span>' },
+    { word: 'twelve',    emoji: '<span class="num-display">12</span>' },
+    { word: 'thirteen',  emoji: '<span class="num-display">13</span>' },
+    { word: 'fourteen',  emoji: '<span class="num-display">14</span>' },
+    { word: 'fifteen',   emoji: '<span class="num-display">15</span>' },
+    { word: 'sixteen',   emoji: '<span class="num-display">16</span>' },
+    { word: 'seventeen', emoji: '<span class="num-display">17</span>' },
+    { word: 'eighteen',  emoji: '<span class="num-display">18</span>' },
+    { word: 'nineteen',  emoji: '<span class="num-display">19</span>' },
+    { word: 'twenty',    emoji: '<span class="num-display">20</span>' },
+  ],
+  colours: [
+    { word: 'blue',   emoji: '<span class="colour-box" style="background:#3182ce;"></span>' },
+    { word: 'red',    emoji: '<span class="colour-box" style="background:#e53e3e;"></span>' },
+    { word: 'purple', emoji: '<span class="colour-box" style="background:#805ad5;"></span>' },
+    { word: 'green',  emoji: '<span class="colour-box" style="background:#38a169;"></span>' },
+    { word: 'orange', emoji: '<span class="colour-box" style="background:#dd6b20;"></span>' },
+    { word: 'white',  emoji: '<span class="colour-box" style="background:#ffffff;"></span>' },
+    { word: 'yellow', emoji: '<span class="colour-box" style="background:#ecc94b;"></span>' },
+    { word: 'pink',   emoji: '<span class="colour-box" style="background:#f687b3;"></span>' },
+  ],
+  yesno: [
+    { speak: 'Is this a banana?',     emoji: '🍌',     accept: ["Yes, it is.", "Yes it is", "Yes, it is"] },
+    { speak: 'Is that a cat?',        emoji: '🐈',     accept: ["Yes, it is.", "Yes it is"] },
+    { speak: 'Are these bees?',       emoji: '🐝🐝🐝', accept: ["Yes, they are.", "Yes they are"] },
+    { speak: 'Are those sheep?',      emoji: '🐑🐑🐑', accept: ["Yes, they are.", "Yes they are"] },
+    { speak: 'Is this a dog?',        emoji: '🐈',     accept: ["No, it isn't.", "No it isn't", "No, it is not."] },
+    { speak: 'Is that a tomato?',     emoji: '🍓',     accept: ["No, it isn't.", "No it isn't", "No, it is not."] },
+    { speak: 'Are these butterflies?',emoji: '🐝🐝🐝', accept: ["No, they aren't.", "No they aren't", "No, they are not."] },
+    { speak: 'Are those mangoes?',    emoji: '🍑🍑🍑', accept: ["No, they aren't.", "No they aren't", "No, they are not."] },
+    { speak: 'Is this a strawberry?', emoji: '🍓',     accept: ["Yes, it is.", "Yes it is"] },
+    { speak: 'Are those cows?',       emoji: '🐄🐄🐄', accept: ["Yes, they are.", "Yes they are"] },
+    { speak: 'Are these ducks?',      emoji: '🐔🐔🐔', accept: ["No, they aren't.", "No they aren't"] },
+    { speak: 'Is that a peach?',      emoji: '🍇',     accept: ["No, it isn't.", "No it isn't"] },
+  ],
+  wh: [
+    { speak: 'What is Paul doing?',          emoji: '👦📖', accept: ["He is reading a book.", "He's reading a book.", "Reading a book"] },
+    { speak: 'Who is drinking milk?',        emoji: '🥛',   accept: ["Mary is.", "Mary", "Mary is drinking milk."] },
+    { speak: 'What is Mary drinking?',       emoji: '👧🥛', accept: ["She is drinking milk.", "She's drinking milk.", "Milk"] },
+    { speak: 'Where is Joe?',                emoji: '🧒🎤', accept: ["He is in the garden.", "He's in the garden.", "In the garden"] },
+    { speak: 'What is Lucy drawing?',        emoji: '👶🎨', accept: ["She is drawing a flower.", "She's drawing a flower.", "A flower"] },
+    { speak: 'Who is singing?',              emoji: '🎤',   accept: ["Joe is.", "Joe", "Joe is singing."] },
+    { speak: 'Where is Paul?',               emoji: '👦📖', accept: ["He is in the bedroom.", "He's in the bedroom.", "In the bedroom"] },
+    { speak: 'How many people are there?',   emoji: '👦👧🧒👶', accept: ["Four.", "4", "Four", "There are four."] },
+    { speak: 'Who is reading a book?',       emoji: '📖',   accept: ["Paul is.", "Paul", "Paul is reading a book."] },
+    { speak: 'Where is Lucy?',               emoji: '👶🎨', accept: ["She is in the classroom.", "She's in the classroom.", "In the classroom"] },
+  ],
+};
+
+/* =========================================================
+   SPEECH SYNTHESIS
+========================================================= */
+let currentSpeed = 1;
+let currentPitch = 1;
+let currentVoice = null;
+let voices = [];
+
+function loadVoices() {
+  voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
+  const sel = document.getElementById('voiceSelect');
+  sel.innerHTML = '';
+  if (voices.length === 0) {
+    voices = speechSynthesis.getVoices();
+  }
+  voices.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${v.name} (${v.lang})`;
+    sel.appendChild(opt);
+  });
+  // Prefer a female English voice if found
+  const preferred = voices.findIndex(v =>
+    /female|samantha|karen|tessa|moira|fiona|google us|zira|google uk english female/i.test(v.name));
+  if (preferred >= 0) {
+    sel.value = preferred;
+    currentVoice = voices[preferred];
+  } else if (voices.length > 0) {
+    currentVoice = voices[0];
+  }
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+document.getElementById('voiceSelect').addEventListener('change', e => {
+  currentVoice = voices[e.target.value];
+});
+
+document.querySelectorAll('.speed-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpeed = parseFloat(btn.dataset.speed);
+  });
+});
+
+const pitchInput = document.getElementById('pitch');
+const pitchVal = document.getElementById('pitchVal');
+pitchInput.addEventListener('input', () => {
+  currentPitch = parseFloat(pitchInput.value);
+  pitchVal.textContent = currentPitch.toFixed(1);
+});
+
+function speak(text) {
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = currentSpeed;
+  utt.pitch = currentPitch;
+  if (currentVoice) utt.voice = currentVoice;
+  speechSynthesis.speak(utt);
+}
+
+/* =========================================================
+   RENDERING
+========================================================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderSection(key) {
+  const container = document.getElementById(key);
+  container.innerHTML = '';
+  const items = shuffle(DATA[key]);
+
+  items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const num = document.createElement('span');
+    num.className = 'num';
+    num.textContent = (idx + 1) + '.';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'play-btn';
+    playBtn.textContent = '▶';
+    const speakText = it.speak || it.word;
+    playBtn.title = 'Listen';
+    playBtn.addEventListener('click', () => speak(speakText));
+
+    const ill = document.createElement('span');
+    ill.className = 'illustration';
+    ill.innerHTML = it.emoji;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer';
+    input.placeholder = 'Type what you hear...';
+    input.dataset.key = key;
+    if (it.accept) {
+      input.dataset.accept = JSON.stringify(it.accept);
+    } else {
+      input.dataset.accept = JSON.stringify([it.word]);
+    }
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkOne(input);
+    });
+
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'check-btn';
+    checkBtn.textContent = 'Check';
+    checkBtn.addEventListener('click', () => checkOne(input));
+
+    const showBtn = document.createElement('button');
+    showBtn.className = 'show-btn';
+    showBtn.textContent = 'Show';
+    showBtn.addEventListener('click', () => showOne(input));
+
+    const fb = document.createElement('span');
+    fb.className = 'feedback';
+
+    row.appendChild(num);
+    row.appendChild(playBtn);
+    row.appendChild(ill);
+    row.appendChild(input);
+    row.appendChild(checkBtn);
+    row.appendChild(showBtn);
+    row.appendChild(fb);
+    container.appendChild(row);
+  });
+}
+
+/* =========================================================
+   CHECK / SHOW LOGIC
+========================================================= */
+function normalize(s) {
+  return s.toLowerCase().trim()
+          .replace(/[.,!?;:'"]/g, '')
+          .replace(/\s+/g, ' ');
+}
+
+function checkOne(input) {
+  const accept = JSON.parse(input.dataset.accept);
+  const userAns = normalize(input.value);
+  const fb = input.parentElement.querySelector('.feedback');
+  const ok = accept.some(a => normalize(a) === userAns);
+  if (userAns === '') {
+    fb.textContent = '✏️';
+    fb.className = 'feedback';
+    return;
+  }
+  if (ok) {
+    fb.textContent = '✓';
+    fb.className = 'feedback correct';
+  } else {
+    fb.textContent = '✗';
+    fb.className = 'feedback wrong';
+  }
+}
+
+function showOne(input) {
+  const accept = JSON.parse(input.dataset.accept);
+  const fb = input.parentElement.querySelector('.feedback');
+  fb.innerHTML = '<span class="answer-text">' + accept[0] + '</span>';
+  fb.className = 'feedback';
+}
+
+function checkAll(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => checkOne(inp));
+}
+
+function showAll(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => showOne(inp));
+}
+
+function resetSection(key) {
+  document.querySelectorAll(`#${key} input.answer`).forEach(inp => {
+    inp.value = '';
+    const fb = inp.parentElement.querySelector('.feedback');
+    fb.textContent = '';
+    fb.className = 'feedback';
+  });
+}
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+['fruits','actions','animals','numbers','colours','yesno','wh'].forEach(renderSection);
+</script>
+
+</body>
+</html>
