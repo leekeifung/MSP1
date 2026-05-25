@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文科 — 選詞填充練習</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: 'PingFang HK', 'Microsoft JhengHei', '微軟正黑體', 'Heiti TC', sans-serif;
+  max-width: 1100px; margin: 0 auto; padding: 16px; padding-top: 120px;
+  background: linear-gradient(180deg, #fef3e2 0%, #fff5e6 100%);
+  color: #2d3748; min-height: 100vh;
+}
+h1 { color: #c53030; margin-bottom: 4px; font-size: 28px; }
+h2 { color: #c53030; border-bottom: 3px solid #fbd38d; padding-bottom: 6px; margin-top: 24px; }
+.subtitle { color: #718096; margin-top: 0; }
+.panel { background: white; border-radius: 12px; padding: 20px; margin: 12px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+.voice-panel-wrapper {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: #fff5e6; border-bottom: 3px solid #ed8936;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.voice-panel-inner { max-width: 1100px; margin: 0 auto; padding: 8px 16px; }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 3px 0; }
+.speed-btn { padding: 5px 11px; border-radius: 6px; border: 1.5px solid #fbd38d; background: white; cursor: pointer; font-weight: 600; font-size: 13px; }
+.speed-btn.active { background: #ed8936; color: white; border-color: #c05621; }
+.speed-btn:hover { background: #fef3e2; }
+
+#vocab-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; margin-top: 12px;
+}
+.vocab-card {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  border: 2px solid #fb923c; border-radius: 12px; padding: 14px 8px;
+  font-size: 22px; font-weight: bold; color: #7c2d12;
+  transition: transform 0.15s;
+}
+.vocab-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.vocab-play {
+  background: #ea580c; color: white; border: none; border-radius: 50%;
+  width: 38px; height: 38px; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.vocab-play:hover { background: #9a3412; }
+
+.score-board {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 3px solid #f59e0b; border-radius: 14px;
+  padding: 14px 20px; margin-bottom: 16px;
+  font-size: 22px; font-weight: bold; color: #7c2d12;
+  text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.score-board .score-num { color: #c2410c; font-size: 28px; margin: 0 6px; }
+
+#selected-indicator {
+  display: none;
+  background: #ddd6fe; border: 2px solid #8b5cf6; border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 12px;
+  color: #5b21b6; font-weight: bold; text-align: center;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+#selected-indicator.visible { display: block; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+}
+
+.word-bank-container {
+  background: #fffaf0; border: 2px dashed #fbbf24; border-radius: 12px;
+  padding: 12px; margin-bottom: 16px;
+}
+.word-bank-title { font-weight: bold; color: #92400e; margin-bottom: 8px; font-size: 16px; }
+#word-bank { display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; }
+.word-tile {
+  display: inline-block; padding: 10px 16px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white; border-radius: 10px;
+  font-size: 19px; font-weight: bold;
+  cursor: grab; user-select: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: all 0.15s;
+}
+.word-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.word-tile.dragging { opacity: 0.4; }
+.word-tile.selected {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px #fbbf24, 0 4px 12px rgba(0,0,0,0.3);
+}
+.word-tile.used {
+  background: #d1d5db; color: #9ca3af; cursor: not-allowed;
+  text-decoration: line-through; box-shadow: none;
+}
+.word-tile.used:hover { transform: none; box-shadow: none; }
+
+.sentence-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 8px; border-bottom: 1px dashed #e2e8f0;
+  font-size: 19px; line-height: 1.9; flex-wrap: wrap;
+}
+.sentence-row:last-child { border-bottom: none; }
+.q-num {
+  color: white; background: #ea580c;
+  font-weight: bold; min-width: 32px;
+  font-size: 16px;
+  border-radius: 50%; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sentence-text { flex: 1; min-width: 200px; }
+.blank {
+  display: inline-block; min-width: 100px; min-height: 38px;
+  margin: 0 4px; padding: 4px 12px;
+  border: 2px dashed #94a3b8; border-radius: 8px;
+  background: #f8fafc; text-align: center; vertical-align: middle;
+  font-weight: bold; cursor: pointer;
+  transition: all 0.15s; color: #1e40af;
+}
+.blank:hover { background: #e0f2fe; border-color: #38bdf8; }
+.blank.filled {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white; border: 2px solid #1e40af; border-style: solid;
+}
+.blank.correct {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white; border: 2px solid #047857; border-style: solid;
+}
+.blank.wrong {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: white; border: 2px solid #b91c1c; border-style: solid;
+}
+.blank.shown {
+  background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+  color: white; border: 2px solid #9a3412; border-style: solid;
+}
+.blank.drag-over {
+  background: #fef3c7; border-color: #f59e0b; transform: scale(1.05);
+}
+.feedback-icon { font-size: 22px; font-weight: bold; min-width: 28px; text-align: center; }
+
+.controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.check-btn { background: #16a34a; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
+.check-btn:hover { background: #15803d; }
+.show-btn { background: #ea580c; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
+.show-btn:hover { background: #c2410c; }
+.reset-btn { background: #6366f1; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
+.reset-btn:hover { background: #4f46e5; }
+.new-btn { background: #a855f7; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
+.new-btn:hover { background: #7e22ce; }
+
+.info {
+  background: #fffaf0; border-left: 4px solid #ed8936;
+  padding: 10px 14px; margin: 8px 0; border-radius: 4px;
+  font-size: 14px; color: #7c2d12;
+}
+
+select.voice-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #fbd38d; max-width: 220px; font-size: 13px; }
+.pitch-display { font-weight: bold; color: #c05621; min-width: 30px; }
+
+@media (max-width: 700px) {
+  body { padding-top: 150px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+  .sentence-row { font-size: 16px; }
+  .word-tile { font-size: 16px; padding: 8px 12px; }
+  .blank { min-width: 80px; font-size: 16px; }
+  .score-board { font-size: 18px; padding: 10px 14px; }
+  .score-board .score-num { font-size: 22px; }
+  .vocab-card { font-size: 18px; padding: 10px 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="voice-panel-wrapper">
+  <div class="voice-panel-inner">
+    <div class="row">
+      <strong style="color:#c05621;">🔊 廣東話讀音</strong>
+      <span style="color:#7c2d12;">速度：</span>
+      <button class="speed-btn" data-speed="0.5">0.5x</button>
+      <button class="speed-btn" data-speed="0.7">0.7x</button>
+      <button class="speed-btn active" data-speed="0.85">0.85x</button>
+      <button class="speed-btn" data-speed="1">1x</button>
+    </div>
+    <div class="row">
+      <span style="color:#7c2d12;">音調：</span>
+      <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1" style="width:120px;">
+      <span class="pitch-display" id="pitchVal">1.0</span>
+      <span style="color:#7c2d12;">| 聲音：</span>
+      <select id="voiceSelect" class="voice-select"></select>
+    </div>
+  </div>
+</div>
+
+<h1>📚 中文科 — 選詞填充練習</h1>
+<p class="subtitle">對象：香港小一精英 • 名校重點訓練</p>
+<div class="info">💡 每次重新整理頁面，題目順序及句子都會不同。按【🎲 新一輪】可即時換新題目 — 每組字詞配 3 個不同句子，每輪只出一句！</div>
+
+<h2>第一部份 — 認識字詞 🔊</h2>
+<div class="panel">
+  <p style="color:#4a5568;">按下喇叭聽廣東話讀音，認識每個字詞：</p>
+  <div id="vocab-grid"></div>
+</div>
+
+<h2>第二部份 — 選詞填充 ✏️</h2>
+<div class="panel">
+  <p style="color:#4a5568;">把適當的字詞放入句子中的方格內。<br>
+  💻 <strong>電腦：</strong>用滑鼠拖動字詞到方格；&nbsp;&nbsp;
+  📱 <strong>手機：</strong>輕點字詞 → 再輕點方格</p>
+  
+  <div class="score-board" id="scoreBoard">
+    📊 已填：<span class="score-num"><span id="scoreNum">0</span> / 20</span>
+  </div>
+  
+  <div id="selected-indicator">
+    👆 已選：「<span id="selected-word"></span>」　請點擊方格放入
+  </div>
+  
+  <div class="word-bank-container">
+    <div class="word-bank-title">📦 字詞庫（共 20 個）</div>
+    <div id="word-bank"></div>
+  </div>
+  
+  <div id="sentences"></div>
+  
+  <div class="controls">
+    <button class="check-btn" onclick="checkAnswers()">✅ 檢查分數</button>
+    <button class="show-btn" onclick="showAllAnswers()">👁️ 顯示答案</button>
+    <button class="reset-btn" onclick="resetQuiz()">🔄 清除答案</button>
+    <button class="new-btn" onclick="newRound()">🎲 新一輪</button>
+  </div>
+</div>
+
+<p style="text-align:center;color:#a0aec0;margin:24px 0;">— 練習完畢 — 加油！💪</p>
+
+<script>
+const VOCAB = [
+  { word:'探望', sentences:[
+    '星期日，我和媽媽去___爺爺。',
+    '同學生病了，老師去___他。',
+    '我們一家人去___嫲嫲，她很開心。'
+  ]},
+  { word:'連忙', sentences:[
+    '看見婆婆跌倒，我___走過去扶她。',
+    '媽媽叫我吃飯，我___放下玩具。',
+    '下雨了，我___把衣服收回家。'
+  ]},
+  { word:'散步', sentences:[
+    '晚飯後，爸爸和我去公園___。',
+    '爺爺每天早上都到花園___。',
+    '我喜歡和小狗一起在公園___。'
+  ]},
+  { word:'回答', sentences:[
+    '老師問問題，我___得很好。',
+    '哥哥很聰明，能___所有問題。',
+    '媽媽問我功課做完了沒有，我___：「做完了。」'
+  ]},
+  { word:'辦法', sentences:[
+    '這道題目太難，我想不到___。',
+    '老師教我們做功課的好___。',
+    '哥哥幫我想了一個好___。'
+  ]},
+  { word:'着急', sentences:[
+    '找不到媽媽，我很___。',
+    '快遲到了，爸爸十分___。',
+    '妹妹哭了，我___得不知怎麼辦。'
+  ]},
+  { word:'困難', sentences:[
+    '這個問題很___，我不會做。',
+    '遇到___時，要勇敢面對。',
+    '只要努力，再大的___也不怕。'
+  ]},
+  { word:'消息', sentences:[
+    '我聽到一個好___，明天放假！',
+    '爸爸告訴我們一個好___。',
+    '這個壞___讓大家都不開心。'
+  ]},
+  { word:'大聲', sentences:[
+    '老師叫我們不要___說話。',
+    '弟弟肚子餓了，___地哭起來。',
+    '請你___讀出這個字。'
+  ]},
+  { word:'報告', sentences:[
+    '我做了一份天氣___。',
+    '班長向老師___今天的事情。',
+    '哥哥把好成績___給爸爸聽。'
+  ]},
+  { word:'自己', sentences:[
+    '我會___穿衣服。',
+    '哥哥___一個人去學校。',
+    '妹妹想___吃飯。'
+  ]},
+  { word:'許多', sentences:[
+    '公園裏有___小朋友在玩。',
+    '媽媽買了___水果回家。',
+    '我有___好朋友。'
+  ]},
+  { word:'溫習', sentences:[
+    '明天要考試，我要___中文。',
+    '哥哥每天都___功課。',
+    '老師叫我們回家好好___。'
+  ]},
+  { word:'幫忙', sentences:[
+    '媽媽煮飯，我去___。',
+    '同學跌倒了，我去___他。',
+    '弟弟做功課有困難，姐姐去___他。'
+  ]},
+  { word:'功課', sentences:[
+    '我每天都會做___。',
+    '老師派了很多___給我們。',
+    '做完___才可以看電視。'
+  ]},
+  { word:'接着', sentences:[
+    '我先做功課，___去洗澡。',
+    '爸爸吃完飯，___去散步。',
+    '老師講完故事，___問我們問題。'
+  ]},
+  { word:'勇敢', sentences:[
+    '小明很___，不怕黑。',
+    '我們要做___的孩子。',
+    '哥哥___地保護妹妹。'
+  ]},
+  { word:'發生', sentences:[
+    '學校___了一件好事。',
+    '不知道___什麼事，大家都跑出來。',
+    '今天___了一件有趣的事。'
+  ]},
+  { word:'聽見', sentences:[
+    '我___小鳥在唱歌。',
+    '弟弟___媽媽的聲音就跑過去。',
+    '你___老師說話了嗎？'
+  ]},
+  { word:'一會兒', sentences:[
+    '請等我___，我馬上來。',
+    '妹妹哭了___就睡着了。',
+    '我們玩了___就回家了。'
+  ]},
+];
+
+let currentSpeed = 0.85, currentPitch = 1, currentVoice = null, voices = [];
+
+function loadVoices() {
+  let all = speechSynthesis.getVoices();
+  let cantonese = all.filter(v => /yue|zh-HK|zh_HK/i.test(v.lang) || /cantonese|hong kong/i.test(v.name));
+  let chineseOther = all.filter(v => /zh|chinese/i.test(v.lang + ' ' + v.name) && !cantonese.includes(v));
+  voices = [...cantonese, ...chineseOther];
+  if (voices.length === 0) voices = all;
+  
+  const sel = document.getElementById('voiceSelect');
+  sel.innerHTML = '';
+  voices.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    const isCanto = cantonese.includes(v);
+    opt.textContent = (isCanto ? '⭐ ' : '') + `${v.name} (${v.lang})`;
+    sel.appendChild(opt);
+  });
+  
+  if (cantonese.length > 0) {
+    currentVoice = cantonese[0];
+    sel.value = voices.indexOf(cantonese[0]);
+  } else if (voices.length > 0) {
+    currentVoice = voices[0];
+  }
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+document.getElementById('voiceSelect').addEventListener('change', e => {
+  currentVoice = voices[e.target.value];
+});
+document.querySelectorAll('.speed-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpeed = parseFloat(btn.dataset.speed);
+  });
+});
+const pitchInput = document.getElementById('pitch');
+const pitchVal = document.getElementById('pitchVal');
+pitchInput.addEventListener('input', () => {
+  currentPitch = parseFloat(pitchInput.value);
+  pitchVal.textContent = currentPitch.toFixed(1);
+});
+
+function speak(text) {
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = currentSpeed;
+  utt.pitch = currentPitch;
+  utt.lang = 'zh-HK';
+  if (currentVoice) utt.voice = currentVoice;
+  speechSynthesis.speak(utt);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderVocab() {
+  const grid = document.getElementById('vocab-grid');
+  grid.innerHTML = '';
+  VOCAB.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'vocab-card';
+    
+    const playBtn = document.createElement('button');
+    playBtn.className = 'vocab-play';
+    playBtn.textContent = '🔊';
+    playBtn.title = '聽讀音';
+    playBtn.onclick = () => speak(v.word);
+    
+    const word = document.createElement('span');
+    word.textContent = v.word;
+    word.style.cursor = 'pointer';
+    word.onclick = () => speak(v.word);
+    
+    card.append(playBtn, word);
+    grid.appendChild(card);
+  });
+}
+
+let quizQuestions = [];
+let placements = {};
+let selectedWord = null;
+let usedWords = new Set();
+let bankOrder = null;
+let mode = 'normal';
+
+function newRound() {
+  placements = {};
+  selectedWord = null;
+  usedWords = new Set();
+  mode = 'normal';
+  bankOrder = shuffle(VOCAB.map(v => v.word));
+  
+  quizQuestions = shuffle(VOCAB).map((v, i) => ({
+    word: v.word,
+    sentence: v.sentences[Math.floor(Math.random() * v.sentences.length)],
+    blankId: `blank-${i}`
+  }));
+  
+  renderQuiz();
+  updateScoreDisplay();
+  updateSelectedIndicator();
+}
+
+function renderQuiz() {
+  const bank = document.getElementById('word-bank');
+  bank.innerHTML = '';
+  if (!bankOrder) bankOrder = shuffle(VOCAB.map(v => v.word));
+  
+  bankOrder.forEach(word => {
+    const tile = document.createElement('div');
+    tile.className = 'word-tile';
+    tile.textContent = word;
+    tile.dataset.word = word;
+    
+    if (usedWords.has(word)) {
+      tile.classList.add('used');
+    } else {
+      tile.draggable = true;
+    }
+    if (selectedWord === word) tile.classList.add('selected');
+    
+    tile.addEventListener('click', () => {
+      if (usedWords.has(word)) return;
+      selectedWord = (selectedWord === word) ? null : word;
+      renderQuiz();
+      updateSelectedIndicator();
+    });
+    
+    tile.addEventListener('dragstart', (e) => {
+      if (usedWords.has(word)) { e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', word);
+      e.dataTransfer.effectAllowed = 'move';
+      tile.classList.add('dragging');
+    });
+    tile.addEventListener('dragend', () => tile.classList.remove('dragging'));
+    
+    bank.appendChild(tile);
+  });
+  
+  const container = document.getElementById('sentences');
+  container.innerHTML = '';
+  quizQuestions.forEach((q, idx) => {
+    const row = document.createElement('div');
+    row.className = 'sentence-row';
+    
+    const num = document.createElement('span');
+    num.className = 'q-num';
+    num.textContent = (idx + 1);
+    
+    const text = document.createElement('span');
+    text.className = 'sentence-text';
+    
+    const parts = q.sentence.split('___');
+    const before = document.createElement('span');
+    before.textContent = parts[0];
+    
+    const blank = document.createElement('span');
+    blank.className = 'blank';
+    blank.dataset.blankId = q.blankId;
+    
+    if (placements[q.blankId]) {
+      blank.textContent = placements[q.blankId];
+      blank.classList.add('filled');
+      if (mode === 'checked') {
+        if (placements[q.blankId] === q.word) blank.classList.add('correct');
+        else blank.classList.add('wrong');
+      } else if (mode === 'shown') {
+        blank.classList.add('shown');
+      }
+    } else {
+      blank.innerHTML = '&nbsp;';
+    }
+    
+    blank.addEventListener('click', () => {
+      const blankId = q.blankId;
+      if (selectedWord) {
+        if (placements[blankId]) usedWords.delete(placements[blankId]);
+        placements[blankId] = selectedWord;
+        usedWords.add(selectedWord);
+        selectedWord = null;
+        mode = 'normal';
+        renderQuiz();
+        updateScoreDisplay();
+        updateSelectedIndicator();
+      } else if (placements[blankId]) {
+        usedWords.delete(placements[blankId]);
+        delete placements[blankId];
+        mode = 'normal';
+        renderQuiz();
+        updateScoreDisplay();
+      }
+    });
+    
+    blank.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      blank.classList.add('drag-over');
+    });
+    blank.addEventListener('dragleave', () => blank.classList.remove('drag-over'));
+    blank.addEventListener('drop', (e) => {
+      e.preventDefault();
+      blank.classList.remove('drag-over');
+      const word = e.dataTransfer.getData('text/plain');
+      if (!word) return;
+      if (placements[q.blankId]) usedWords.delete(placements[q.blankId]);
+      placements[q.blankId] = word;
+      usedWords.add(word);
+      mode = 'normal';
+      renderQuiz();
+      updateScoreDisplay();
+    });
+    
+    const after = document.createElement('span');
+    after.textContent = parts[1] || '';
+    
+    text.append(before, blank, after);
+    
+    const fb = document.createElement('span');
+    fb.className = 'feedback-icon';
+    if (mode === 'checked' && placements[q.blankId]) {
+      if (placements[q.blankId] === q.word) {
+        fb.textContent = '✓';
+        fb.style.color = '#16a34a';
+      } else {
+        fb.textContent = '✗';
+        fb.style.color = '#dc2626';
+      }
+    }
+    
+    row.append(num, text, fb);
+    container.appendChild(row);
+  });
+}
+
+function updateScoreDisplay() {
+  const filled = Object.keys(placements).length;
+  document.getElementById('scoreBoard').innerHTML = 
+    `📊 已填：<span class="score-num">${filled} / 20</span>`;
+}
+
+function updateSelectedIndicator() {
+  const ind = document.getElementById('selected-indicator');
+  if (selectedWord) {
+    document.getElementById('selected-word').textContent = selectedWord;
+    ind.classList.add('visible');
+  } else {
+    ind.classList.remove('visible');
+  }
+}
+
+function checkAnswers() {
+  mode = 'checked';
+  let correct = 0;
+  quizQuestions.forEach(q => {
+    if (placements[q.blankId] === q.word) correct++;
+  });
+  renderQuiz();
+  
+  let emoji = '😊', comment = '';
+  const pct = (correct / 20) * 100;
+  
+  if (correct === 20) { emoji = '🏆'; comment = '完美！太厲害了！'; }
+  else if (correct >= 18) { emoji = '🌟'; comment = '非常好！'; }
+  else if (correct >= 15) { emoji = '👍'; comment = '做得不錯！'; }
+  else if (correct >= 12) { emoji = '💪'; comment = '繼續努力！'; }
+  else if (correct >= 8) { emoji = '📖'; comment = '加油溫習！'; }
+  else { emoji = '🤔'; comment = '要多多練習啊！'; }
+  
+  document.getElementById('scoreBoard').innerHTML = 
+    `${emoji} 答對：<span class="score-num">${correct} / 20</span>（${pct.toFixed(0)}%） ${comment}`;
+}
+
+function showAllAnswers() {
+  placements = {};
+  usedWords = new Set();
+  quizQuestions.forEach(q => {
+    placements[q.blankId] = q.word;
+    usedWords.add(q.word);
+  });
+  mode = 'shown';
+  selectedWord = null;
+  renderQuiz();
+  updateSelectedIndicator();
+  document.getElementById('scoreBoard').innerHTML = 
+    `🔍 已顯示正確答案，請再試試！`;
+}
+
+function resetQuiz() {
+  placements = {};
+  usedWords = new Set();
+  selectedWord = null;
+  mode = 'normal';
+  renderQuiz();
+  updateScoreDisplay();
+  updateSelectedIndicator();
+}
+
+function adjustBodyPadding() {
+  const panel = document.querySelector('.voice-panel-wrapper');
+  if (panel) document.body.style.paddingTop = (panel.offsetHeight + 16) + 'px';
+}
+window.addEventListener('load', adjustBodyPadding);
+window.addEventListener('resize', adjustBodyPadding);
+
+renderVocab();
+newRound();
+adjustBodyPadding();
+</script>
+</body>
+</html>
