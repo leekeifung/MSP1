@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合十速算挑戰</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f7ff;
+            background-image: radial-gradient(#d0e8ff 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .title-font {
+            font-family: 'Fredoka One', 'Noto Sans TC', sans-serif;
+        }
+
+        /* 數字汽泡 */
+        .num-bubble {
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            touch-action: none; /* 防止移動端拖曳時頁面滾動 */
+        }
+        
+        .num-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .num-bubble:active {
+            transform: scale(0.95);
+        }
+
+        .selected-bubble {
+            box-shadow: 0 0 0 6px #f59e0b !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        /* 成功合併動畫 */
+        @keyframes pop-merge {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .merged-animate {
+            animation: pop-merge 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 flex flex-col items-center justify-between">
+
+    <!-- 頂部標題與計分板 -->
+    <div class="w-full max-w-4xl flex flex-col md:flex-row justify-between items-center bg-white rounded-2xl p-4 shadow-md border-2 border-blue-100 mb-6">
+        <div class="flex items-center gap-3">
+            <div class="bg-yellow-400 p-2 rounded-xl text-3xl">💡</div>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-blue-600 title-font tracking-wide">合十速算挑戰</h1>
+                <p class="text-xs md:text-sm text-gray-500 font-bold">從25題題庫中隨機挑選8題。拖動或點擊能「合十」的數字合併，然後填寫答案！</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-4 mt-3 md:mt-0">
+            <!-- 星星計分 -->
+            <div class="bg-amber-100 text-amber-700 font-bold px-4 py-2 rounded-full flex items-center gap-2 border border-amber-300">
+                <span class="text-xl">⭐</span>
+                <span>答對：<span id="score-display" class="text-lg font-black text-amber-600">0</span> / 8 題</span>
+            </div>
+            <!-- 重設按鈕 -->
+            <button onclick="resetGame()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold px-4 py-2 rounded-xl transition duration-200 text-sm">
+                🔄 換一組新題目
+            </button>
+        </div>
+    </div>
+
+    <!-- 遊戲主區域 -->
+    <div class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- 左側：題目區 (佔 2 欄) -->
+        <div class="lg:col-span-2 space-y-4">
+            <div id="questions-list" class="space-y-4">
+                <!-- 題目將會透過 JavaScript 動態渲染進來 -->
+            </div>
+        </div>
+
+        <!-- 右側：玩法指南 & 工坊 -->
+        <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-blue-100 space-y-6">
+            <h2 class="text-xl font-black text-blue-800 border-b pb-2 flex items-center gap-2">
+                <span>🎒</span> 甚麼是「合十法」？
+            </h2>
+            
+            <div class="space-y-3 text-sm text-gray-600 font-medium">
+                <p class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    💡 <strong>小秘訣：</strong> 先找出相加等於 <span class="text-blue-600 font-bold">10、20、30...</span> 的好朋友！
+                </p>
+                <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                    <div class="bg-green-50 p-2 rounded-lg border border-green-200 font-bold text-green-700">1 + 9 = 10 🤝</div>
+                    <div class="bg-green-50 p-2 rounded-lg border border-green-200 font-bold text-green-700">2 + 8 = 10 🤝</div>
+                    <div class="bg-green-50 p-2 rounded-lg border border-green-200 font-bold text-green-700">3 + 7 = 10 🤝</div>
+                    <div class="bg-green-50 p-2 rounded-lg border border-green-200 font-bold text-green-700">4 + 5 + 1 = 10</div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h3 class="font-bold text-gray-800 mb-2">🎮 操作說明：</h3>
+                    <ul class="list-disc pl-4 space-y-1 text-xs">
+                        <li><strong>方法 A (觸控/點選)：</strong> 先點選一個汽泡，再點選另一個能和它湊整十的汽泡。</li>
+                        <li><strong>方法 B (滑鼠拖曳)：</strong> 將一個汽泡拖曳到另一個汽泡上重疊放開。</li>
+                        <li><strong>方法 C (觸控拖曳)：</strong> 在手機/平板上，可直接用手指拖動泡泡進行合併！</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 動態配對示範 -->
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <h3 class="text-sm font-bold text-amber-800 mb-2 flex items-center gap-1">
+                    <span>✨</span> 合併示範
+                </h3>
+                <div class="flex items-center justify-around">
+                    <div class="w-10 h-10 rounded-full bg-blue-400 text-white font-bold flex items-center justify-center shadow-md">3</div>
+                    <span class="text-amber-500 font-bold">+</span>
+                    <div class="w-10 h-10 rounded-full bg-blue-400 text-white font-bold flex items-center justify-center shadow-md">7</div>
+                    <span class="text-amber-500 font-bold">➔</span>
+                    <div class="w-12 h-12 rounded-full bg-green-500 text-white font-black flex items-center justify-center shadow-md border-2 border-white animate-bounce">10</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部版權 -->
+    <div class="mt-8 text-center text-xs text-gray-400 font-bold">
+        合十速算挑戰賽 • 專為小學一年級人文/數學科設計
+    </div>
+
+    <!-- 煙花 Canvas 用於答對時慶祝 -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- 遊戲邏輯 JS -->
+    <script>
+        // 音效合成器 (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'pop') {
+                    // 合併音效 - 快速上升的短音
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'correct') {
+                    // 答對音效 - 愉悅的和弦
+                    const t = audioCtx.currentTime;
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, t + idx * 0.08);
+                        g.gain.setValueAtTime(0.15, t + idx * 0.08);
+                        g.gain.linearRampToValueAtTime(0.01, t + idx * 0.08 + 0.3);
+                        o.start(t + idx * 0.08);
+                        o.stop(t + idx * 0.08 + 0.3);
+                    });
+                } else if (type === 'wrong') {
+                    // 答錯音效 - 低沉震動
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                }
+            } catch (e) {
+                console.log("Audio Web API not supported or blocked");
+            }
+        }
+
+        // 題目數據資料庫（包含工作紙內容與新增至 25 題的題庫）
+        const questionBank = [
+            // 原有工作紙題目
+            { id: 1, numbers: [1, 5, 9, 5], correctAns: 20 },
+            { id: 2, numbers: [6, 2, 8, 4], correctAns: 20 },
+            { id: 3, numbers: [1, 3, 9, 7, 2], correctAns: 22 },
+            { id: 4, numbers: [3, 4, 2, 7, 8], correctAns: 24 },
+            { id: 5, numbers: [18, 7, 2], correctAns: 27 },
+            { id: 6, numbers: [21, 9, 8], correctAns: 38 },
+            { id: 7, numbers: [5, 7, 33], correctAns: 45 },
+            { id: 8, numbers: [9, 14, 16], correctAns: 39 },
+            // 新增擴充題目 (合十、湊十、合二十、合三十系列)
+            { id: 9, numbers: [7, 5, 3, 5], correctAns: 20 },
+            { id: 10, numbers: [8, 4, 2, 6], correctAns: 20 },
+            { id: 11, numbers: [2, 5, 8, 5, 3], correctAns: 23 },
+            { id: 12, numbers: [9, 1, 6, 4, 7], correctAns: 27 },
+            { id: 13, numbers: [26, 3, 4], correctAns: 33 },
+            { id: 14, numbers: [12, 8, 9], correctAns: 29 },
+            { id: 15, numbers: [15, 6, 15], correctAns: 36 },
+            { id: 16, numbers: [3, 27, 8], correctAns: 38 },
+            { id: 17, numbers: [32, 5, 8], correctAns: 45 },
+            { id: 18, numbers: [19, 6, 11], correctAns: 36 },
+            { id: 19, numbers: [4, 13, 7], correctAns: 24 },
+            { id: 20, numbers: [25, 5, 9], correctAns: 39 },
+            { id: 21, numbers: [14, 9, 6, 1], correctAns: 30 },
+            { id: 22, numbers: [23, 2, 7, 8], correctAns: 40 },
+            { id: 23, numbers: [17, 8, 3], correctAns: 28 },
+            { id: 24, numbers: [35, 4, 5], correctAns: 44 },
+            { id: 25, numbers: [6, 1, 24, 9], correctAns: 40 }
+        ];
+
+        // 遊戲狀態 (存儲當前被抽出的 8 題)
+        let gameState = [];
+        let score = 0;
+        let selectedBubble = null; // 用於點擊點選模式
+
+        // 隨機打亂陣列順序的 Fisher-Yates 演算法
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // 初始化/重設遊戲 (每次從 25 題庫中隨機挑選 8 題)
+        function resetGame() {
+            // 打亂題庫
+            const shuffled = shuffleArray(questionBank);
+            // 挑選前 8 題
+            const selectedQuestions = shuffled.slice(0, 8);
+            
+            // 使用深拷貝保存至 gameState 中，避免影響原始數據
+            gameState = JSON.parse(JSON.stringify(selectedQuestions));
+            
+            score = 0;
+            selectedBubble = null;
+            document.getElementById('score-display').textContent = score;
+            renderQuestions();
+        }
+
+        // 渲染題目清單
+        function renderQuestions() {
+            const listContainer = document.getElementById('questions-list');
+            listContainer.innerHTML = '';
+
+            gameState.forEach((q, index) => {
+                const row = document.createElement('div');
+                row.className = `bg-white rounded-2xl p-4 md:p-5 shadow border-2 transition duration-300 ${q.isCorrect ? 'border-green-300 bg-green-50' : 'border-blue-100 hover:border-blue-300'}`;
+                row.id = `q-row-${q.id}`;
+
+                // 行內配置：題目序號 -> 汽泡運算區 -> 等號 -> 輸入答案與按鈕
+                let htmlContent = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <!-- 左側：序號與汽泡區 -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-lg font-black text-blue-500 mr-2">${index + 1}.</span>
+                            <div class="flex flex-wrap items-center gap-2" id="sandbox-${q.id}">
+                `;
+
+                // 渲染該題目的所有數字汽泡與加號
+                q.numbers.forEach((num, numIdx) => {
+                    if (num === null) return; // 已被合併並隱藏的數
+
+                    const isCombined = num.isCombined;
+                    const val = isCombined ? num.value : num;
+
+                    // 輸出數字汽泡
+                    htmlContent += `
+                        <div class="num-bubble select-none ${isCombined ? 'bg-green-500 text-white font-black border-2 border-white scale-110 shadow-md merged-animate' : 'bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold border-2 border-sky-300'} w-11 h-11 rounded-full flex items-center justify-center cursor-pointer shadow-sm text-lg relative"
+                             draggable="true"
+                             data-qid="${q.id}"
+                             data-nidx="${numIdx}"
+                             data-val="${val}"
+                             onclick="handleBubbleClick(this)">
+                            ${val}
+                        </div>
+                    `;
+
+                    // 在數字間補加號
+                    if (numIdx < q.numbers.length - 1 && hasMoreActiveNumbers(q.numbers, numIdx)) {
+                        htmlContent += `<span class="text-gray-400 font-bold text-lg select-none">+</span>`;
+                    }
+                });
+
+                // 右側：輸入答案與檢查
+                htmlContent += `
+                            </div>
+                        </div>
+                        
+                        <!-- 右側：等號、輸入框、檢查按鈕 -->
+                        <div class="flex items-center gap-2 justify-end border-t md:border-t-0 pt-3 md:pt-0">
+                            <span class="text-xl font-bold text-gray-500">=</span>
+                            <input type="number" 
+                                   id="input-${q.id}" 
+                                   placeholder="答案?" 
+                                   ${q.isCorrect ? 'disabled' : ''}
+                                   value="${q.userVal || ''}"
+                                   class="w-20 px-2 py-2 text-center text-lg font-black rounded-xl border-2 focus:outline-none transition ${q.isCorrect ? 'border-green-500 bg-green-100 text-green-700' : 'border-gray-300 focus:border-blue-500 text-blue-700'}" />
+                            
+                            ${q.isCorrect ? `
+                                <span class="bg-green-500 text-white text-xs font-black px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm">
+                                    <span>✔</span> 答對了
+                                </span>
+                            ` : `
+                                <button onclick="checkQuestion(${q.id})" class="bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black px-4 py-2 rounded-xl text-sm transition duration-150 shadow-sm">
+                                    檢查
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                row.innerHTML = htmlContent;
+                listContainer.appendChild(row);
+            });
+
+            setupDragAndDrop();
+        }
+
+        // 輔助判斷後面是否還有未被合併隱藏的數字，用來決定是否要顯示「+」號
+        function hasMoreActiveNumbers(numbers, currentIdx) {
+            for (let i = currentIdx + 1; i < numbers.length; i++) {
+                if (numbers[i] !== null) return true;
+            }
+            return false;
+        }
+
+        // 處理泡泡點擊與配對 (觸控 & 點選模式)
+        function handleBubbleClick(element) {
+            const qid = parseInt(element.getAttribute('data-qid'));
+            const nidx = parseInt(element.getAttribute('data-nidx'));
+            const val = parseInt(element.getAttribute('data-val'));
+
+            // 檢查這題是不是已經過關
+            const question = gameState.find(q => q.id === qid);
+            if (question.isCorrect) return;
+
+            if (selectedBubble === null) {
+                // 第一下選擇
+                selectedBubble = { element, qid, nidx, val };
+                element.classList.add('selected-bubble');
+            } else {
+                // 第二下選擇
+                if (selectedBubble.qid === qid && selectedBubble.nidx !== nidx) {
+                    // 同一題，不同的兩個數字泡泡
+                    const val1 = selectedBubble.val;
+                    const val2 = val;
+
+                    if ((val1 + val2) % 10 === 0) {
+                        // 完美合十 (或湊整十)
+                        mergeBubbles(qid, selectedBubble.nidx, nidx, val1 + val2);
+                    } else {
+                        // 不能合十，閃爍紅框提示
+                        element.classList.add('border-red-500');
+                        playSound('wrong');
+                        setTimeout(() => element.classList.remove('border-red-500'), 400);
+                    }
+                }
+                
+                // 釋放選擇狀態
+                if (selectedBubble && selectedBubble.element) {
+                    selectedBubble.element.classList.remove('selected-bubble');
+                }
+                selectedBubble = null;
+            }
+        }
+
+        // 執行合併邏輯
+        function mergeBubbles(qid, idx1, idx2, newValue) {
+            const q = gameState.find(item => item.id === qid);
+            
+            // 將第2個位置替換為合併後的新物件
+            q.numbers[idx2] = {
+                value: newValue,
+                isCombined: true
+            };
+            // 隱藏第1個位置的數字
+            q.numbers[idx1] = null;
+
+            playSound('pop');
+            renderQuestions();
+        }
+
+        // 設置 Drag-and-Drop (全面支持滑鼠與行動觸控拖曳)
+        function setupDragAndDrop() {
+            const bubbles = document.querySelectorAll('.num-bubble');
+            let draggedInfo = null;
+
+            // --- 滑鼠拖曳 (電腦版) ---
+            bubbles.forEach(bubble => {
+                bubble.addEventListener('dragstart', function(e) {
+                    const qid = parseInt(this.getAttribute('data-qid'));
+                    if (gameState.find(q => q.id === qid).isCorrect) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    draggedInfo = {
+                        qid: qid,
+                        nidx: parseInt(this.getAttribute('data-nidx')),
+                        val: parseInt(this.getAttribute('data-val'))
+                    };
+                    this.style.opacity = '0.5';
+                });
+
+                bubble.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                });
+
+                bubble.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+
+                bubble.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (!draggedInfo) return;
+
+                    const targetQid = parseInt(this.getAttribute('data-qid'));
+                    const targetNidx = parseInt(this.getAttribute('data-nidx'));
+                    const targetVal = parseInt(this.getAttribute('data-val'));
+
+                    if (draggedInfo.qid === targetQid && draggedInfo.nidx !== targetNidx) {
+                        const sum = draggedInfo.val + targetVal;
+                        if (sum % 10 === 0) {
+                            mergeBubbles(targetQid, draggedInfo.nidx, targetNidx, sum);
+                        } else {
+                            playSound('wrong');
+                        }
+                    }
+                    draggedInfo = null;
+                });
+
+                // --- 觸控拖曳 (平板/手機版) ---
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let activeDragBubble = null;
+
+                bubble.addEventListener('touchstart', function(e) {
+                    const qid = parseInt(this.getAttribute('data-qid'));
+                    if (gameState.find(q => q.id === qid).isCorrect) return;
+
+                    // 避免觸控拖曳時引發瀏覽器滾動
+                    e.preventDefault(); 
+                    activeDragBubble = this;
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    this.style.zIndex = "100";
+                    this.style.transition = "none";
+                }, { passive: false });
+
+                bubble.addEventListener('touchmove', function(e) {
+                    if (!activeDragBubble) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const dx = touch.clientX - touchStartX;
+                    const dy = touch.clientY - touchStartY;
+                    activeDragBubble.style.transform = `translate(${dx}px, ${dy}px) scale(1.15)`;
+                }, { passive: false });
+
+                bubble.addEventListener('touchend', function(e) {
+                    if (!activeDragBubble) return;
+                    const el = activeDragBubble;
+                    activeDragBubble = null;
+
+                    el.style.zIndex = "";
+                    el.style.transition = "all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                    el.style.transform = "";
+
+                    const touch = e.changedTouches[0];
+                    // 偵測釋放點之下的 DOM 節點
+                    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                    
+                    if (targetEl && targetEl.classList.contains('num-bubble') && targetEl !== el) {
+                        const qid = parseInt(el.getAttribute('data-qid'));
+                        const targetQid = parseInt(targetEl.getAttribute('data-qid'));
+                        const nidx1 = parseInt(el.getAttribute('data-nidx'));
+                        const nidx2 = parseInt(targetEl.getAttribute('data-nidx'));
+                        const val1 = parseInt(el.getAttribute('data-val'));
+                        const val2 = parseInt(targetEl.getAttribute('data-val'));
+
+                        if (qid === targetQid && nidx1 !== nidx2) {
+                            const sum = val1 + val2;
+                            if (sum % 10 === 0) {
+                                mergeBubbles(qid, nidx1, nidx2, sum);
+                                return;
+                            }
+                        }
+                    }
+                    playSound('wrong');
+                }, { passive: false });
+            });
+        }
+
+        // 檢查單題答案
+        function checkQuestion(qid) {
+            const q = gameState.find(item => item.id === qid);
+            const inputVal = document.getElementById(`input-${qid}`).value;
+            q.userVal = inputVal;
+
+            if (parseInt(inputVal) === q.correctAns) {
+                q.isCorrect = true;
+                score++;
+                document.getElementById('score-display').textContent = score;
+                playSound('correct');
+                triggerConfetti();
+                renderQuestions();
+            } else {
+                // 答錯閃爍紅色警示
+                const row = document.getElementById(`q-row-${qid}`);
+                row.classList.add('border-red-400', 'bg-red-50');
+                playSound('wrong');
+                setTimeout(() => {
+                    row.classList.remove('border-red-400', 'bg-red-50');
+                }, 800);
+            }
+        }
+
+        // 繽紛紙屑粒子特效
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfetti() {
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 20,
+                    size: Math.random() * 8 + 4,
+                    color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+                    speedX: Math.random() * 8 - 4,
+                    speedY: Math.random() * -14 - 8,
+                    gravity: 0.35,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 12 - 6
+                });
+            }
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.speedY += p.gravity;
+                p.rotation += p.rotationSpeed;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                if (p.y > canvas.height + 50) {
+                    particles.splice(idx, 1);
+                }
+            });
+            requestAnimationFrame(updateParticles);
+        }
+        updateParticles();
+
+        // 頁面載入自動初始化
+        window.onload = function() {
+            resetGame();
+        };
+    </script>
+</body>
+</html>
+
